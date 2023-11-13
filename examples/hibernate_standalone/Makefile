@@ -1,0 +1,3 @@
+
+schema:
+	./gradlew -q schema

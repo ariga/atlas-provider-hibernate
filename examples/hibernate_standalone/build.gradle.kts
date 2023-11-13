@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.20"
     application
+    id("org.ariga.atlashibernate") apply true
 }
 
 kotlin {
@@ -15,7 +16,6 @@ buildscript {
         mavenCentral()
     }
 }
-
 
 repositories {
     mavenCentral()
