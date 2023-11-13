@@ -26,35 +26,6 @@ dependencies {
     runtimeOnly("mysql:mysql-connector-java:8.0.33")
 }
 
-sourceSets {
-    main {
-        resources {
-            srcDirs("src/main/resources", "src/main/configs")
-        }
-    }
-}
-
 kotlin {
     jvmToolchain(17)
 }
-
-tasks.withType<ProcessResources>().all { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
-tasks.withType<Copy>().all { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
-
-//application {
-//    mainClass.set("Main")
-//}
-
-//tasks.named<SchemaTask>("schema") {
-//    dialect = "MySQL"
-//    packageFilter = listOf("org.example.model")
-//    metadataBuilderClass = "org.example.MetadataBuilderImpl"
-//}
-//
-//tasks.create("mini-schema", SchemaTask::class.java) {
-//    dialect = "MySQL"
-//}
-
-//tasks.named<SchemaTask>("schema") {
-//
-//}
