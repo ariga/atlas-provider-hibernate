@@ -203,7 +203,7 @@ class HibernateProvider : Plugin<Project> {
         val atlasConfig = project.configurations.create("atlas") {
             it.extendsFrom(project.configurations.named("runtimeClasspath").get())
         }
-        project.dependencies.add(atlasConfig.name, "io.atlasgo:atlashibernate")
+        project.dependencies.add(atlasConfig.name, "io.atlasgo:hibernate")
         project.tasks.register("schema", SchemaTask::class.java) {
             project.javaPlugin?.let { javaPlugin ->
                 it.classpath = project.files(
