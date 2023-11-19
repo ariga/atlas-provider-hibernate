@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.20"
     application
-    id("io.ariga.atlashibernate") version "0.1" apply true
+    id("io.ariga.atlas") version "0.1" apply true
 }
 
 kotlin {
@@ -14,9 +14,6 @@ version = "1.0"
 buildscript {
     repositories {
         mavenCentral()
-    }
-    dependencies {
-        classpath("io.ariga:atlashibernate")
     }
 }
 
