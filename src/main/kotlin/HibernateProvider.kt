@@ -32,16 +32,17 @@ import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool
 import org.hibernate.tool.schema.internal.exec.GenerationTarget
 import org.hibernate.tool.schema.spi.SchemaManagementTool
 import org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator
+import java.io.OutputStream
 import java.net.URI
 import java.net.URL
 import java.util.*
 import java.util.function.Function
 import java.util.logging.Level
 
-class ConsoleGenerationTarget : GenerationTarget {
+class ConsoleGenerationTarget(private val writer: OutputStream = System.out) : GenerationTarget {
     override fun prepare() {}
     override fun accept(command: String) {
-        println("$command;")
+        writer.write("$command;\n".toByteArray())
     }
     override fun release() {}
 }
@@ -122,7 +123,7 @@ class PrintSchemaCommand: CliktCommand() {
         SchemaManagementToolCoordinator.process(
             metadata,
             registry,
-            PropertiesHelper.map(settings) + toolSettings
+            toolSettings
         ) { }
     }
 
@@ -224,8 +225,8 @@ class HibernateProvider : Plugin<Project> {
     }
 }
 
-private fun String.toBase64() = Base64.getEncoder().encodeToString(this.encodeToByteArray())
-private fun String.decodeBase64(): String = Base64.getDecoder().decode(this).decodeToString()
+fun String.toBase64() = Base64.getEncoder().encodeToString(this.encodeToByteArray())
+fun String.decodeBase64(): String = Base64.getDecoder().decode(this).decodeToString()
 
 private val JavaPluginExtension.mainSourceSet: SourceSet?
     get() = sourceSets.named(MAIN_SOURCE_SET_NAME).get()

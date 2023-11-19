@@ -39,4 +39,13 @@ dependencies {
     compileOnly(gradleApi())
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     runtimeOnly(kotlin("stdlib"))
+
+    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
+    testImplementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
+    testImplementation("com.h2database:h2:2.2.224")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

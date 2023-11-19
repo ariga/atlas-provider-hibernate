@@ -21,6 +21,10 @@ jobs:
       - name: Build Plugin
         run: ./gradlew build
 
+      - name: Run tests
+        run: |
+          ./gradlew test
+
       - name: Build Sample Project
         run: |
           cd examples/hibernate_standalone/
@@ -28,7 +32,6 @@ jobs:
 
       - name: Test default schema task
         run: |
-          set -x
           cd examples/hibernate_standalone/
           ./gradlew -q schema > schema_output
           diff schema_output src/test/expected_default_schema
