@@ -1,2 +1,2 @@
-rootProject.name = "atlashibernate"
+rootProject.name = "hibernate"
 
