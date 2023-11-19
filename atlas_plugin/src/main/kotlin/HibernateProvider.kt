@@ -196,7 +196,7 @@ abstract class SchemaTask : JavaExec() {
     }
 }
 
-class AtlasHibernate : Plugin<Project> {
+class HibernateProvider : Plugin<Project> {
     override fun apply(project: Project) {
         val atlasConfig = project.configurations.create("atlas") {
             it.extendsFrom(project.configurations.named("runtimeClasspath").get())
@@ -208,7 +208,7 @@ class AtlasHibernate : Plugin<Project> {
                     javaPlugin.mainSourceSet?.output,
                     javaPlugin.mainSourceSet?.output?.resourcesDir,
                     atlasConfig)
-                it.mainClass.set("io.ariga.AtlasHibernate")
+                it.mainClass.set(HibernateProvider::class.java.canonicalName)
             }
             it.dependsOn("compileJava", "processResources")
             it.group = "Atlas"

@@ -30,7 +30,7 @@ gradlePlugin {
         create("atlashibernate") {
             description = "Atlas Hibernate plugin is used as an Atlas schema provider for Hibernate."
             id = "io.ariga.atlashibernate"
-            implementationClass = "io.ariga.AtlasHibernate"
+            implementationClass = "io.ariga.HibernateProvider"
         }
     }
 }
