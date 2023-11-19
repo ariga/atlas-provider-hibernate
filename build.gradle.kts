@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm") version "1.9.20"
 }
 
-group = "io.ariga"
+group = "io.atlasgo"
 version = "0.1"
 
 repositories {
