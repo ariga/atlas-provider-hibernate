@@ -2,6 +2,9 @@ pluginManagement {
     repositories {
         mavenCentral()
         gradlePluginPortal()
+        mavenLocal {
+            url = uri("../../local-plugin-repository/")
+        }
     }
 }
 
@@ -10,4 +13,4 @@ plugins {
 }
 
 rootProject.name = "sample_project"
-includeBuild("../../atlas_plugin/")
+includeBuild("../../")

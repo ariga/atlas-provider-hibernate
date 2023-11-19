@@ -1,14 +1,13 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("java")
     `java-library`
     `java-gradle-plugin`
     kotlin("jvm") version "1.9.20"
 }
 
-group = "org.ariga"
-version = "1.0-SNAPSHOT"
+group = "io.ariga"
+version = "0.1"
 
 repositories {
     mavenCentral()
@@ -27,15 +26,17 @@ kotlin {
 
 gradlePlugin {
     plugins {
-        create("atlashibernate") {
-            id = "org.ariga.atlashibernate"
-            implementationClass = "org.ariga.AtlasHibernate"
+        create("io.atlasgo.hibernate") {
+            description = "Atlas plugin, used as a database schema provider to Atlas."
+            id = "io.atlasgo.hibernate"
+            implementationClass = "io.atlasgo.HibernateProvider"
         }
     }
 }
 
 dependencies {
-    implementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
-//    implementation("org.hibernate.orm:hibernate-core:6.1.7.Final")
+    implementation(kotlin("stdlib"))
+    implementation("com.github.ajalt.clikt:clikt:4.2.1")
+    implementation("org.hibernate.orm:hibernate-core:6.1.7.Final")
     implementation(gradleApi())
 }
