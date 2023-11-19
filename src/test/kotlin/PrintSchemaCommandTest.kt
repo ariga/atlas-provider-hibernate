@@ -120,7 +120,7 @@ class PrintSchemaCommandTest {
             ),
             Inputs(
                 expectedOutput =
-                    "break tests on purpose" +
+                    "create sequence OtherPackageEvent_SEQ start with 1 increment by 50;\n" +
                     "create table OtherPackageEvent (id bigint not null, title varchar(255), primary key (id));\n",
                 builderClassName = WithOtherPackageEventMetadata::class.java.name,
             ),
