@@ -1,6 +1,5 @@
 plugins {
     application
-    id("io.atlasgo.hibernate") version "0.1" apply true
 }
 
 group = "org.example"
