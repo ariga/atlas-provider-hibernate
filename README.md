@@ -1,1 +1,0 @@
-To print the schema, run `make schema` inside the sample project
