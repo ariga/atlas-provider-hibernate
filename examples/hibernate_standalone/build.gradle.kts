@@ -1,11 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.20"
     application
     id("io.atlasgo.hibernate") version "0.1" apply true
-}
-
-kotlin {
-    jvmToolchain(11)
 }
 
 group = "org.example"
