@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.20"
     application
-    id("io.ariga.atlas") version "0.1" apply true
+    id("io.atlasgo.hibernate") version "0.1" apply true
 }
 
 kotlin {

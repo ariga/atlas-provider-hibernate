@@ -1,4 +1,4 @@
-package io.ariga
+package io.atlasgo
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
@@ -36,6 +36,7 @@ import java.net.URI
 import java.net.URL
 import java.util.*
 import java.util.function.Function
+import java.util.logging.Level
 
 class ConsoleGenerationTarget : GenerationTarget {
     override fun prepare() {}
@@ -84,6 +85,7 @@ class PrintSchemaCommand: CliktCommand() {
         .default("")
 
     override fun run() {
+        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
         val settings = Properties().also { p ->
             p.putAll(mapOf(
                 "hibernate.temp.use_jdbc_metadata_defaults" to false,

@@ -26,10 +26,10 @@ kotlin {
 
 gradlePlugin {
     plugins {
-        create("atlash") {
+        create("io.atlasgo.hibernate") {
             description = "Atlas plugin, used as a database schema provider to Atlas."
-            id = "io.ariga.atlas"
-            implementationClass = "io.ariga.HibernateProvider"
+            id = "io.atlasgo.hibernate"
+            implementationClass = "io.atlasgo.HibernateProvider"
         }
     }
 }
