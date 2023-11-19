@@ -28,6 +28,7 @@ jobs:
 
       - name: Test default schema task
         run: |
+          set -x
           cd examples/hibernate_standalone/
-          ./gradlew schema > schema_output
+          ./gradlew -q schema > schema_output
           diff schema_output src/test/expected_default_schema
