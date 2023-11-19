@@ -25,7 +25,3 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     runtimeOnly("mysql:mysql-connector-java:8.0.33")
 }
-
-kotlin {
-    jvmToolchain(11)
-}
