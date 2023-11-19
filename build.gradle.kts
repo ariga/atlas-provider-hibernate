@@ -37,6 +37,6 @@ gradlePlugin {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
-    implementation("org.hibernate.orm:hibernate-core:6.1.7.Final")
+    compileOnly("org.hibernate.orm:hibernate-core:6.1.7.Final")
     implementation(gradleApi())
 }
