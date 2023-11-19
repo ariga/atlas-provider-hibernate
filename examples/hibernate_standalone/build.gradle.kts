@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.20"
     application
-    id("org.ariga.atlashibernate") apply true
+    id("io.atlasgo.hibernate") version "0.1" apply true
 }
 
 kotlin {
@@ -9,7 +9,7 @@ kotlin {
 }
 
 group = "org.example"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 buildscript {
     repositories {
@@ -27,5 +27,5 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(14)
 }
