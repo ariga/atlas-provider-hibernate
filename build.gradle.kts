@@ -26,9 +26,9 @@ kotlin {
 
 gradlePlugin {
     plugins {
-        create("io.atlasgo.hibernate") {
+        create("io.atlasgo.hibernate-provider") {
             description = "Atlas plugin, used as a database schema provider to Atlas."
-            id = "io.atlasgo.hibernate"
+            id = "io.atlasgo.hibernate-provider"
             implementationClass = "io.atlasgo.HibernateProvider"
         }
     }
