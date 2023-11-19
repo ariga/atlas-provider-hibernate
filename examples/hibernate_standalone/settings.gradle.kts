@@ -13,4 +13,4 @@ plugins {
 }
 
 rootProject.name = "sample_project"
-includeBuild("../../atlas_plugin")
+includeBuild("../../")
