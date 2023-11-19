@@ -11,7 +11,5 @@ public class Main {
                 .addAnnotatedClasses(Event.class)
                 .addAnnotatedClasses(Location.class)
                 .buildMetadata();
-        Object o = new MetadataBuilderImpl();
-        System.out.println("Hello world " + o);
     }
 }
