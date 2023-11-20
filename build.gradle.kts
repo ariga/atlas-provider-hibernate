@@ -1,8 +1,11 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
     `java-gradle-plugin`
+    id("com.gradle.plugin-publish") version "1.1.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     kotlin("jvm") version "1.9.20"
 }
 
@@ -11,6 +14,10 @@ version = "0.1"
 
 repositories {
     mavenCentral()
+}
+
+tasks.withType<ShadowJar> {
+    archiveClassifier = null
 }
 
 java {
@@ -27,6 +34,8 @@ kotlin {
 gradlePlugin {
     plugins {
         create("io.atlasgo.hibernate-provider") {
+            website = "https://github.com/ariga/atlas-provider-hibernate"
+            vcsUrl = "https://github.com/ariga/atlas-provider-hibernate.git"
             description = "Atlas plugin, used as a database schema provider to Atlas."
             id = "io.atlasgo.hibernate-provider"
             implementationClass = "io.atlasgo.HibernateProvider"
@@ -34,9 +43,18 @@ gradlePlugin {
     }
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "localPluginRepository"
+            url = uri(".local-plugin-repository")
+        }
+    }
+}
+
 dependencies {
     compileOnly("org.hibernate.orm:hibernate-core:6.1.7.Final")
-    compileOnly(gradleApi())
+    implementation(gradleApi())
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     runtimeOnly(kotlin("stdlib"))
 
