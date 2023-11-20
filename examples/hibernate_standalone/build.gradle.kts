@@ -17,6 +17,7 @@ repositories {
 }
 
 dependencies {
+    implementation("io.atlasgo:hibernate-provider:0.1")
     implementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     runtimeOnly("mysql:mysql-connector-java:8.0.33")
 }

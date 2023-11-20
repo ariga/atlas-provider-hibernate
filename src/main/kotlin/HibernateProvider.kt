@@ -201,18 +201,15 @@ abstract class SchemaTask : JavaExec() {
 
 class HibernateProvider : Plugin<Project> {
     override fun apply(project: Project) {
-        val atlasConfig = project.configurations.create("atlas") {
-            it.extendsFrom(project.configurations.named("runtimeClasspath").get())
-        }
-        project.dependencies.add(atlasConfig.name, "io.atlasgo:hibernate-provider")
         project.tasks.register("schema", SchemaTask::class.java) {
             project.javaPlugin?.let { javaPlugin ->
                 it.classpath = project.files(
+                    this::class.java.protectionDomain.codeSource.location,
                     javaPlugin.mainSourceSet?.output,
                     javaPlugin.mainSourceSet?.output?.resourcesDir,
-                    atlasConfig)
-                it.mainClass.set(HibernateProvider::class.java.canonicalName)
+                    project.configurations.named("runtimeClasspath").get().files)
             }
+            it.mainClass.set(HibernateProvider::class.java.canonicalName)
             it.dependsOn("compileJava", "processResources")
             it.group = "Atlas"
             it.description = "Prints Hibernate schema to be used as Atlas schema provider"
@@ -225,7 +222,7 @@ class HibernateProvider : Plugin<Project> {
     }
 }
 
-fun String.toBase64() = Base64.getEncoder().encodeToString(this.encodeToByteArray())
+fun String.toBase64(): String = Base64.getEncoder().encodeToString(this.encodeToByteArray())
 fun String.decodeBase64(): String = Base64.getDecoder().decode(this).decodeToString()
 
 private val JavaPluginExtension.mainSourceSet: SourceSet?
