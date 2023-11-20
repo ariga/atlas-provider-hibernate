@@ -18,17 +18,16 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Build Plugin
+      - name: Build and test Plugin
         run: ./gradlew build
 
-      - name: Build Sample Project
+      - name: Build and test Sample Project
         run: |
           cd examples/hibernate_standalone/
           ./gradlew build
 
       - name: Test default schema task
         run: |
-          set -x
           cd examples/hibernate_standalone/
           ./gradlew -q schema > schema_output
           diff schema_output src/test/expected_default_schema
