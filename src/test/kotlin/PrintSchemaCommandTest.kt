@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import org.hibernate.boot.Metadata
 import org.hibernate.boot.MetadataSources
-import org.hibernate.boot.registry.StandardServiceRegistry
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.hibernate.internal.util.PropertiesHelper
 import org.hibernate.service.ServiceRegistry
@@ -17,11 +16,12 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
-import java.util.Properties
+import java.util.*
 import java.util.function.Function
+import kotlin.test.assertFails
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
 
@@ -33,6 +33,8 @@ class Event {
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: Long? = null
 }
+
+typealias TestExceptionType = RuntimeException
 
 class PrintSchemaCommandTest {
     private val command = PrintSchemaCommand()
@@ -75,6 +77,40 @@ class PrintSchemaCommandTest {
             args += listOf("--metadata-builder", it)
         }
         assertEquals(expectedOutput, command.test(args).output)
+    }
+
+    @Test
+    fun errorOnServiceRegistry() {
+        class ThrowingRegistryBuilder : Function<Properties, ServiceRegistry> {
+            override fun apply(t: Properties): ServiceRegistry {
+                throw TestExceptionType()
+            }
+        }
+        assertFailsWith<TestExceptionType>{
+            command.test("--registry-builder ${ThrowingRegistryBuilder::class.java.name}")
+        }
+    }
+
+    @Test
+    fun errorOnMetadataBuilder() {
+        class ThrowingMetadataBuilder : Function<ServiceRegistry, Metadata> {
+            override fun apply(t: ServiceRegistry): Metadata {
+                throw TestExceptionType()
+            }
+        }
+        assertFailsWith<TestExceptionType>{
+            command.test("--metadata-builder ${ThrowingMetadataBuilder::class.java.name}")
+        }
+    }
+
+    @Test
+    fun missingConfigurationsFails() {
+        assertFails {
+            command.test("--properties empty-properties")
+        }
+        assertFails {
+            command.test("")
+        }
     }
 
     companion object {
@@ -156,5 +192,4 @@ class WithOtherPackageEventMetadata : Function<ServiceRegistry, Metadata> {
             .addAnnotatedClasses(OtherPackageEvent::class.java)
             .buildMetadata()
     }
-
 }
