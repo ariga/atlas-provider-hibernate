@@ -45,6 +45,7 @@ val testTasks = mapOf(
 
 val integrationTest = tasks.register("integrationTests") {
     testTasks.forEach { (testFile, schemaTask) ->
+        println("Running task ${schemaTask.name}")
         var output = ""
         schemaTask.logging.addStandardOutputListener {
             output += it
