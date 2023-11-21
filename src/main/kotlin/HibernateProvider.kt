@@ -85,11 +85,16 @@ class PrintSchemaCommand: CliktCommand() {
         .default("")
 
     override fun run() {
+        if (metadataBuilderClass.isNotBlank() && (classes.isNotEmpty() || packages.isNotEmpty())) {
+            throw RuntimeException("--metadata-builder is mutually exclusive with --packages and --classes")
+        }
         java.util.logging.Logger.getLogger("").level = Level.OFF
         java.util.logging.Logger.getLogger("org.hibernate").level = Level.OFF
         val settings = Properties()
-        Thread.currentThread().contextClassLoader.getResourceAsStream(properties)?.let {
-            settings.load(it)
+        if (properties.isNotBlank()) {
+            Thread.currentThread().contextClassLoader.getResourceAsStream(properties)?.let {
+                settings.load(it)
+            } ?: throw RuntimeException("Unable to load properties file '$properties', is it in the classpath?")
         }
         mapOf(
             "hibernate.temp.use_jdbc_metadata_defaults" to false,
@@ -172,7 +177,7 @@ abstract class SchemaTask : JavaExec() {
     open var classes: List<String> = emptyList()
     
     @Input
-    @Option(option = "propertiesFile", description = "Optional properties file name, must be in classpath")
+    @Option(option = "properties", description = "Optional properties file name, must be in classpath")
     open var propertiesFile: String = ""
 
     init {
@@ -188,27 +193,28 @@ abstract class SchemaTask : JavaExec() {
     
     @TaskAction
     override fun exec() {
-        val scannedClasspath = this.scannedClasspath.asFileTree
-            .filter { f ->
-                packages.isEmpty() || packages.any { packageName ->
-                    f.toPath().parent.endsWith(packageName)
-                }
-            }
-            .map { it.toPath().parent.toUri() }
-            .toSet()
         val args = mutableListOf<String>()
-        if (scannedClasspath.isNotEmpty()) {
-            args += listOf("--packages", scannedClasspath.map {
-                it.toString().toBase64()
-            }.joinToString(","))
-        }
-        if (classes.isNotEmpty()) {
-            args += listOf("--classes", classes.joinToString(","))
-        }
         if (registryBuilderClass.isNotEmpty()) {
             args += listOf("--registry-builder", registryBuilderClass)
         }
-        if (metadataBuilderClass.isNotEmpty()) {
+        if (metadataBuilderClass.isEmpty()) {
+            if (classes.isNotEmpty()) {
+                args += listOf("--classes", classes.joinToString(","))
+            }
+            val scannedClasspath = this.scannedClasspath.asFileTree
+                .filter { f ->
+                    packages.isEmpty() || packages.any { packageName ->
+                        f.toPath().parent.endsWith(packageName)
+                    }
+                }
+                .map { it.toPath().parent.toUri() }
+                .toSet()
+            if (scannedClasspath.isNotEmpty()) {
+                args += listOf("--packages", scannedClasspath.map {
+                    it.toString().toBase64()
+                }.joinToString(","))
+            }
+        } else {
             args += listOf("--metadata-builder", metadataBuilderClass)
         }
         if (propertiesFile.isNotEmpty()) { 
