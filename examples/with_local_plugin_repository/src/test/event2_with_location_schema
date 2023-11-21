@@ -1,0 +1,4 @@
+create table Event2 (id bigint not null, title varchar(255), primary key (id)) engine=InnoDB;
+create table Event2_SEQ (next_val bigint) engine=InnoDB;
+insert into Event2_SEQ values ( 1 );
+create table Location (id bigint not null auto_increment, primary key (id)) engine=InnoDB;

@@ -23,7 +23,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService
 import org.hibernate.cfg.AvailableSettings
 import org.hibernate.engine.jdbc.connections.internal.UserSuppliedConnectionProviderImpl
-import org.hibernate.internal.util.PropertiesHelper
 import org.hibernate.service.ServiceRegistry
 import org.hibernate.service.spi.ServiceRegistryAwareService
 import org.hibernate.service.spi.ServiceRegistryImplementor
@@ -86,15 +85,19 @@ class PrintSchemaCommand: CliktCommand() {
         .default("")
 
     override fun run() {
-        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
-        val settings = Properties().also { p ->
-            p.putAll(mapOf(
-                "hibernate.temp.use_jdbc_metadata_defaults" to false,
-                AvailableSettings.SCHEMA_MANAGEMENT_TOOL to ConsoleSchemaManagementTool(),
-                AvailableSettings.CONNECTION_PROVIDER to UserSuppliedConnectionProviderImpl()
-            ))
-            Thread.currentThread().contextClassLoader.getResourceAsStream(properties)?.let {
-                p.load(it)
+        java.util.logging.Logger.getLogger("").level = Level.OFF
+        java.util.logging.Logger.getLogger("org.hibernate").level = Level.OFF
+        val settings = Properties()
+        Thread.currentThread().contextClassLoader.getResourceAsStream(properties)?.let {
+            settings.load(it)
+        }
+        mapOf(
+            "hibernate.temp.use_jdbc_metadata_defaults" to false,
+            AvailableSettings.SCHEMA_MANAGEMENT_TOOL to ConsoleSchemaManagementTool(),
+            AvailableSettings.CONNECTION_PROVIDER to UserSuppliedConnectionProviderImpl()
+        ).forEach { 
+            if (!settings.containsKey(it.key)) {
+                settings.put(it.key, it.value)
             }
         }
         val registry = registryBuilderClass.takeUnless { it.isNullOrBlank() }?.let {
@@ -158,14 +161,31 @@ abstract class SchemaTask : JavaExec() {
     }
 
     @Input
+    @Option(option = "packages", description = "Optional list of package names that the scanned will use to detect entities. By default scans the entire classpath")
     open var packages: List<String> = emptyList()
         set(newList) {
             field = newList.map { it.replace(".", "/") }
         }
 
     @Input
+    @Option(option = "classes", description = "Optional list of classnames that will be explicitly added as entities (even if the class does not exist in 'packages'). Class must be available in the classpath.")
     open var classes: List<String> = emptyList()
+    
+    @Input
+    @Option(option = "propertiesFile", description = "Optional properties file name, must be in classpath")
+    open var propertiesFile: String = ""
 
+    init {
+        project.javaPlugin?.let { javaPlugin ->
+            classpath = project.files(
+                this::class.java.protectionDomain.codeSource.location,
+                javaPlugin.mainSourceSet?.output,
+                javaPlugin.mainSourceSet?.output?.resourcesDir,
+                project.configurations.named("runtimeClasspath").get().files)
+        }
+        mainClass.set(HibernateProvider::class.java.canonicalName)
+    }
+    
     @TaskAction
     override fun exec() {
         val scannedClasspath = this.scannedClasspath.asFileTree
@@ -182,17 +202,17 @@ abstract class SchemaTask : JavaExec() {
                 it.toString().toBase64()
             }.joinToString(","))
         }
-
         if (classes.isNotEmpty()) {
             args += listOf("--classes", classes.joinToString(","))
         }
-
         if (registryBuilderClass.isNotEmpty()) {
             args += listOf("--registry-builder", registryBuilderClass)
         }
-
         if (metadataBuilderClass.isNotEmpty()) {
             args += listOf("--metadata-builder", metadataBuilderClass)
+        }
+        if (propertiesFile.isNotEmpty()) { 
+            args += listOf("--properties", propertiesFile)
         }
         this.args = args
         super.exec()
@@ -201,18 +221,7 @@ abstract class SchemaTask : JavaExec() {
 
 class HibernateProvider : Plugin<Project> {
     override fun apply(project: Project) {
-        val atlasConfig = project.configurations.create("atlas") {
-            it.extendsFrom(project.configurations.named("runtimeClasspath").get())
-        }
-        project.dependencies.add(atlasConfig.name, "io.atlasgo:hibernate-provider")
         project.tasks.register("schema", SchemaTask::class.java) {
-            project.javaPlugin?.let { javaPlugin ->
-                it.classpath = project.files(
-                    javaPlugin.mainSourceSet?.output,
-                    javaPlugin.mainSourceSet?.output?.resourcesDir,
-                    atlasConfig)
-                it.mainClass.set(HibernateProvider::class.java.canonicalName)
-            }
             it.dependsOn("compileJava", "processResources")
             it.group = "Atlas"
             it.description = "Prints Hibernate schema to be used as Atlas schema provider"
@@ -225,7 +234,7 @@ class HibernateProvider : Plugin<Project> {
     }
 }
 
-fun String.toBase64() = Base64.getEncoder().encodeToString(this.encodeToByteArray())
+fun String.toBase64(): String = Base64.getEncoder().encodeToString(this.encodeToByteArray())
 fun String.decodeBase64(): String = Base64.getDecoder().decode(this).decodeToString()
 
 private val JavaPluginExtension.mainSourceSet: SourceSet?
