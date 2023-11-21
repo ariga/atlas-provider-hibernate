@@ -7,7 +7,7 @@ import org.hibernate.service.ServiceRegistry;
 
 import java.util.function.Function;
 
-public class MetadataBuilderImpl implements Function<ServiceRegistry, Metadata> {
+public class EventOnlyMetadataBuilder implements Function<ServiceRegistry, Metadata> {
     @Override
     public Metadata apply(ServiceRegistry registry) {
         return new MetadataSources(registry)
