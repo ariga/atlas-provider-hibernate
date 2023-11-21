@@ -20,3 +20,23 @@ env "hibernate_postgresql" {
   dev = "docker://postgres/15/dev?search_path=public"
 }
 
+data "external_schema" "hibernate_example" {
+   program = [
+       "./gradlew",
+       "-q",
+       "schema"
+   ]
+}
+
+env "hibernate_example" {
+   src = data.external_schema.hibernate.url
+   dev = "docker://mysql/8/dev"
+   migration {
+      dir = "file://migrations"
+   }
+   format {
+      migrate {
+         diff = "{{ sql . \"  \" }}"
+      }
+   }
+}

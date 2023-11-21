@@ -41,42 +41,49 @@ By default, the task is configured to scan the entire `runtimeClasspath` configu
 The task does not require a database connection, but it does need to configure Hibernate with a specific database dialect.
 There are several flags and hooks you can use to configure how Hibernate is being initialized inside the task, we will explore these later.
 
-### Basic setup
+### Setup Atlas
 
 In your project directory, create a new file named `atlas.hcl` with the following contents:
 
 ```hcl
 data "external_schema" "hibernate" {
-  program = [
-      "./gradlew", 
-      "-q",
-      "schema"
+   program = [
+       "./gradlew", 
+       "-q",
+       "schema"
    ]
 }
-
+	
 env "hibernate" {
-  url = data.external_schema.hibernate.url
-  dev = "docker://mysql/8/dev"
+   src = data.external_schema.hibernate.url
+   dev = "docker://mysql/8/dev"
+   migration {
+      dir = "file://migrations"
+   }
+   format {
+      migrate {
+         diff = "{{ sql . \"  \" }}"
+      }
+   }
 }
 ```
-
-Let's test this configuration, running the following command should generate the database schema in HCL format:
-```shell
-atlas schema inspect --env hibernate
-```
-
+  
 ### Choosing the dialect
 
-If you would like to use a different database dialect, you need to make some changes:
+The above configuration uses a [dev database](https://atlasgo.io/concepts/dev-database) that is configured to use MySQL.
+The `SchemaTask` is initializing Hibernate which typically uses the file `hibernate.properties` from your project to
+determine which dialect it should be using.
 
-1. Get Hibernate to initialize using the specific dialect. You can do that by changing the properties file (typically `hibernate.properties`), 
-or by specifying an override properties file using `./gradlew -q schema --properties other.properties`.
-2. Update the `external_schema` section in the `atlas.hcl` file
-3. Update the `dev` property inside the `hibernate` to use a different [dev database](https://atlasgo.io/concepts/dev-database)
+If needed, you can override the dialect specification using the `--properties` flag.
 
-For example, for PostgreSQL:
-- defining `jakarta.persistence.database-product-name=PostgreSQL` property and
-- defining `docker://postgres/15/dev?search_path=public` as atlas dev database
+> For example, for PostgreSQL:
+> - define `jakarta.persistence.database-product-name=PostgreSQL` in `hibernate.properties`
+> - define `docker://postgres/15/dev?search_path=public` as atlas dev database in `atlas.hcl`
+
+Now we can check that the configuration is working by inspecting the schema:
+```shell
+atlas schema inspect --env hibernate --url env://src
+```
 
 ### Flags
 The schema task supports the following flags:
@@ -89,7 +96,43 @@ only classes inside these packages will be considered during the entity scan. Gi
 Used when you need to override the default `ServiceRegistry` initialized by the task. Useful if you have a custom initialization process for Hibernate.
 The properties parameter is the default settings used by the plugin, including ones read from the `properties` parameter.
 * `metadata-builder` - FQDN of a class that implements `java.util.Function.Function<org.hibernate.service.ServiceRegistry, org.hibernate.boot.Metadata>`.
-Used when you need to override the default `Metadata` used by the task. mutually exclusive with `packages` and `classes` arguments.  
+Used when you need to override the default `Metadata` used by the task. mutually exclusive with `packages` and `classes` arguments.
+
+You can configure these flags by adding arguments in the `external_schema` block in `atlas.hcl`:
+
+```hcl
+data "external_schema" "hibernate" {
+   program = [
+       "./gradlew",
+       "--properties", "other.properties"
+       "--classes", "org.example.model.Person"
+       "-q",
+       "schema"
+   ]
+}
+```
+
+> Note: The '-q' flag is important, without it, gradle will add additional output
+
+### Gradle tasks
+Alternatively, you can define a new gradle task:
+```
+import io.atlasgo.SchemaTask
+
+tasks.register<SchemaTask>("my_schema") {
+    classes = listOf("org.example.model.Person")
+}
+```
+And refer to this task in `atlas.hcl`:
+```hcl
+data "external_schema" "hibernate" {
+   program = [
+       "./gradlew",
+       "-q",
+       "my_schema"
+   ]
+}
+```
 
 ### Usage
 
@@ -115,19 +158,7 @@ workflow, where each change to the database is versioned and recorded in a migra
 `atlas migrate diff` command to automatically generate a migration file that will migrate the database
 from its latest revision to the current Hibernate schema.
 
-Add the following properties to `hibernate` environment section in `atlas.hcl`: 
-
-```bash
-env "hibernate" {
-  ...
-  src = data.external_schema.hibernate.url
-  migration
-    dir = "file://migrations"
-  }
-}
-```
-
-Now run the `atlas migrate diff --env hibernate` command and observe the `migrations` directory.
+run `atlas migrate diff --env hibernate` command and observe the `migrations` directory.
 
 ### License
 
