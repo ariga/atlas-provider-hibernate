@@ -197,7 +197,7 @@ abstract class SchemaTask : JavaExec() {
         if (registryBuilderClass.isNotEmpty()) {
             args += listOf("--registry-builder", registryBuilderClass)
         }
-        if (metadataBuilderClass.isNotEmpty()) {
+        if (metadataBuilderClass.isEmpty()) {
             if (classes.isNotEmpty()) {
                 args += listOf("--classes", classes.joinToString(","))
             }
