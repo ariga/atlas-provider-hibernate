@@ -193,27 +193,28 @@ abstract class SchemaTask : JavaExec() {
     
     @TaskAction
     override fun exec() {
-        val scannedClasspath = this.scannedClasspath.asFileTree
-            .filter { f ->
-                packages.isEmpty() || packages.any { packageName ->
-                    f.toPath().parent.endsWith(packageName)
-                }
-            }
-            .map { it.toPath().parent.toUri() }
-            .toSet()
         val args = mutableListOf<String>()
-        if (scannedClasspath.isNotEmpty()) {
-            args += listOf("--packages", scannedClasspath.map {
-                it.toString().toBase64()
-            }.joinToString(","))
-        }
-        if (classes.isNotEmpty()) {
-            args += listOf("--classes", classes.joinToString(","))
-        }
         if (registryBuilderClass.isNotEmpty()) {
             args += listOf("--registry-builder", registryBuilderClass)
         }
         if (metadataBuilderClass.isNotEmpty()) {
+            if (classes.isNotEmpty()) {
+                args += listOf("--classes", classes.joinToString(","))
+            }
+            val scannedClasspath = this.scannedClasspath.asFileTree
+                .filter { f ->
+                    packages.isEmpty() || packages.any { packageName ->
+                        f.toPath().parent.endsWith(packageName)
+                    }
+                }
+                .map { it.toPath().parent.toUri() }
+                .toSet()
+            if (scannedClasspath.isNotEmpty()) {
+                args += listOf("--packages", scannedClasspath.map {
+                    it.toString().toBase64()
+                }.joinToString(","))
+            }
+        } else {
             args += listOf("--metadata-builder", metadataBuilderClass)
         }
         if (propertiesFile.isNotEmpty()) { 
