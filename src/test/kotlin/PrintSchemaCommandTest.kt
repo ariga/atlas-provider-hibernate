@@ -34,7 +34,7 @@ class Event {
     var id: Long? = null
 }
 
-typealias TestExceptionType = RuntimeException
+class TestExceptionType : RuntimeException("Test Exception")
 
 class PrintSchemaCommandTest {
     private val command = PrintSchemaCommand()
@@ -104,10 +104,24 @@ class PrintSchemaCommandTest {
     }
 
     @Test
+    fun mutuallyExclusiveFlags() {
+        var error = assertFailsWith<RuntimeException> {
+            command.test("--properties hibernate.properties --metadata-builder something --classes org.example.model")
+        }
+        assertEquals("--metadata-builder is mutually exclusive with --packages and --classes", error.message)
+
+        error = assertFailsWith<RuntimeException> {
+            command.test("--properties hibernate.properties --metadata-builder something --packages ${OtherPackageEvent::class.java.encodedPackageName}")
+        }
+        assertEquals("--metadata-builder is mutually exclusive with --packages and --classes", error.message)
+    }
+
+    @Test
     fun missingConfigurationsFails() {
-        assertFails {
+        val error = assertFailsWith<RuntimeException> {
             command.test("--properties empty-properties")
         }
+        assertEquals("Unable to load properties file 'empty-properties', is it in the classpath?", error.message)
         assertFails {
             command.test("")
         }
