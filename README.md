@@ -82,7 +82,7 @@ If needed, you can override the dialect specification using the `--properties` f
 
 Now we can check that the configuration is working by inspecting the schema:
 ```shell
-atlas schema inspect --env hibernate --url env://src
+atlas schema inspect -w --env hibernate --url env://src
 ```
 
 ### Flags
