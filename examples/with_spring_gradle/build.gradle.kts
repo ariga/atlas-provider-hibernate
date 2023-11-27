@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("org.springframework.boot") version "3.2.0"
+    id("org.springframework.boot") version "3.2.0" apply false
     id("io.spring.dependency-management") version "1.1.4"
 }
 
@@ -24,7 +24,7 @@ dependencies {
     implementation("io.atlasgo:hibernate-provider:0.1")
     implementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     implementation("org.springframework.boot:spring-boot-autoconfigure:3.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa") {
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.0") {
         exclude(module="logback-classic")
     }
     runtimeOnly("com.mysql:mysql-connector-j")
