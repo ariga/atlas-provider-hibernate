@@ -39,3 +39,9 @@ jobs:
           ./gradlew -q schema | tee schema_output
           diff schema_output src/test/expected_default_schema
           ./gradlew integrationTests
+
+      - name: Integration test spring project
+        run: |
+          cd examples/with_spring_gradle
+          ./gradlew -q bootRun | tee schema_output
+          diff schema_output src/test/expected_default_schema
