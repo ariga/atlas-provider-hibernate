@@ -44,29 +44,32 @@ val testTasks = mapOf(
             tasks.getByName<SchemaTask>("schema"))
 
 val integrationTest = tasks.register("integrationTests") {
-    testTasks.forEach { (testFile, schemaTask) ->
-        println("Running task ${schemaTask.name}")
-        var output = ""
-        schemaTask.logging.addStandardOutputListener {
-            output += it
-        }
-        schemaTask.logging.captureStandardOutput(null)
-        schemaTask.standardOutputCapture.start()
-        schemaTask.exec()
-        schemaTask.standardOutputCapture.stop()
-        val expectedOutput = File("src/test/$testFile").readText()
-        if (output != expectedOutput) {
-            println("""
-                output for task ${schemaTask.name} was not as expected (file: $testFile):
-                ----
-                $expectedOutput
-                ----
-                actual output:
-                ----
-                $output
-                ----
-            """.trimIndent())
-            throw RuntimeException("Unexpected output for task ${schemaTask.name}")
+    dependsOn += "build"
+    doLast {
+        testTasks.forEach { (testFile, schemaTask) ->
+            println("Running task ${schemaTask.name}")
+            var output = ""
+            schemaTask.logging.addStandardOutputListener {
+                output += it
+            }
+            schemaTask.logging.captureStandardOutput(null)
+            schemaTask.standardOutputCapture.start()
+            schemaTask.exec()
+            schemaTask.standardOutputCapture.stop()
+            val expectedOutput = File("src/test/$testFile").readText()
+            if (output != expectedOutput) {
+                println("""
+                    output for task ${schemaTask.name} was not as expected (file: $testFile):
+                    ----
+                    $expectedOutput
+                    ----
+                    actual output:
+                    ----
+                    $output
+                    ----
+                """.trimIndent())
+                throw RuntimeException("Unexpected output for task ${schemaTask.name}")
+            }
         }
     }
 }
