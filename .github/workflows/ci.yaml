@@ -12,8 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v3
         with:
-          distribution: zulu
-          java-version: 17
+          distribution: temurin
+          java-version: 11
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
@@ -39,6 +39,11 @@ jobs:
           ./gradlew -q schema | tee schema_output
           diff schema_output src/test/expected_default_schema
           ./gradlew integrationTests
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: zulu
+          java-version: 17
 
       - name: Integration test spring project
         run: |
