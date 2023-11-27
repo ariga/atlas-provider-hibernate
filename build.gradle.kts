@@ -37,6 +37,8 @@ gradlePlugin {
             website = "https://github.com/ariga/atlas-provider-hibernate"
             vcsUrl = "https://github.com/ariga/atlas-provider-hibernate.git"
             description = "Atlas plugin, used as a database schema provider to Atlas."
+            displayName = "Atlas Hibernate Provider"
+            tags = listOf("database", "hibernate", "atlas", "migrations", "schema")
             id = "io.atlasgo.hibernate-provider"
             implementationClass = "io.atlasgo.HibernateProvider"
         }
