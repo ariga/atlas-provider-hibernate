@@ -20,10 +20,6 @@ tasks.withType<ShadowJar> {
     archiveClassifier = null
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-}
-
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_11
