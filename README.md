@@ -198,6 +198,10 @@ spring.jpa.properties.jakarta.persistence.database-major-version=8
 
 In your `atlas.hcl` file you will need to invoke the Spring application instead of the `schema` gradle task.
 
+## Maven
+
+A maven plugin is coming soon.
+
 ### License
 
 This project is licensed under the [Apache License 2.0](LICENSE).
