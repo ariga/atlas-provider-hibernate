@@ -14,6 +14,11 @@ repositories {
     }
 }
 
+java {
+    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
 dependencies {
     runtimeOnly("com.h2database:h2:2.2.224")
     implementation("io.atlasgo:hibernate-provider:0.1")
