@@ -18,6 +18,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
+      - name: Setup Atlas
+        uses: ariga/setup-atlas@master
+
       - name: Build and test Plugin
         run: ./gradlew build
 
@@ -48,5 +51,5 @@ jobs:
       - name: Integration test spring project
         run: |
           cd examples/with_spring_gradle
-          ./gradlew -q bootRun | tee schema_output
-          diff schema_output src/test/expected_default_schema
+          output=$(atlas migrate diff --env hibernate)
+          [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || echo "unexpected output: $output"
