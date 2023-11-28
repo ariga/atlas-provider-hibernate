@@ -52,4 +52,4 @@ jobs:
         run: |
           cd examples/with_spring_gradle
           output=$(atlas migrate diff --env hibernate)
-          [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "unexpected output: $output"; ls -l migrations; exit 1)
+          [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
