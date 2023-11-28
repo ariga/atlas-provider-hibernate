@@ -177,7 +177,7 @@ public class Main {
 
 > A complete example project is provided [here](https://github.com/ariga/atlas-provider-hibernate/tree/79babcfbf4360f2ec0a9263952abe8f55c09fb0e/examples/with_spring_gradle)
 >
-> Try running the example by running: `atlas schema inspect --env hibernate -u "env://src" --dev-url "docker://mysql/8/dev" -w` inside the project directory.
+> Try running the example by running: `atlas schema inspect -w --env hibernate --url env://src` inside the project directory.
 
 We need to configure the spring application so that it will print the schema to stdout. Spring is often configured
 to load Hibernate during startup, by adding the configuration below, we instruct Spring to generate the schema
