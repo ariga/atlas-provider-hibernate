@@ -160,6 +160,48 @@ from its latest revision to the current Hibernate schema.
 
 run `atlas migrate diff --env hibernate` command and observe the `migrations` directory.
 
+## Spring integration
+
+If you are using Spring in your project, you will need to import the `hibernate-provider` and create a new empty spring application, for example:
+
+```java
+
+@SpringBootApplication
+@PropertySource(value = {"classpath:schema-export.properties"})
+public class Main {
+    public static void main(String[] args) {
+        new AnnotationConfigApplicationContext(Main.class);
+    }
+}
+```
+
+> A complete example project is provided [here](https://github.com/ariga/atlas-provider-hibernate/tree/79babcfbf4360f2ec0a9263952abe8f55c09fb0e/examples/with_spring_gradle)
+>
+> Try running the example by running: `atlas schema inspect -w --env hibernate --url env://src` inside the project directory.
+
+We need to configure the spring application so that it will print the schema to stdout. Spring is often configured
+to load Hibernate during startup, by adding the configuration below, we instruct Spring to generate the schema
+during initialization and print it to stdout:
+
+```
+spring.jpa.properties.jakarta.persistence.schema-generation.database.action=create
+spring.jpa.properties.hibernate.schema_management_tool=io.atlasgo.ConsoleSchemaManagementTool
+```
+
+Configuring the driver with dialect and version can be done either via the same configuration file or
+via a dedicated Bean. For example, in the example project, this configuration is used for MySQL 8:
+
+```
+spring.jpa.properties.jakarta.persistence.database-product-name=MySQL
+spring.jpa.properties.jakarta.persistence.database-major-version=8
+```
+
+In your `atlas.hcl` file you will need to invoke the Spring application instead of the `schema` gradle task.
+
+## Maven
+
+A maven plugin is coming soon.
+
 ### License
 
 This project is licensed under the [Apache License 2.0](LICENSE).
