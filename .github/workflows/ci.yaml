@@ -48,7 +48,7 @@ jobs:
           distribution: zulu
           java-version: 17
 
-      - name: Integration test spring project
+      - name: E2E test spring project
         run: |
           cd examples/with_spring_gradle
           output=$(atlas migrate diff --env hibernate)
