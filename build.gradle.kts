@@ -16,10 +16,6 @@ repositories {
     mavenCentral()
 }
 
-tasks.withType<ShadowJar> {
-    archiveClassifier = null
-}
-
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -31,7 +27,23 @@ kotlin {
     }
 }
 
+
+val gradleConf by configurations.creating {
+    extendsFrom(configurations.implementation.get())
+}
+
+val gradle_plugin by sourceSets.creating {
+    compileClasspath += gradleConf + sourceSets.main.get().output
+    runtimeClasspath += gradleConf + sourceSets.main.get().output
+}
+
+tasks.withType<ShadowJar> {
+    archiveClassifier = null
+    from(gradle_plugin.output)
+}
+
 gradlePlugin {
+    pluginSourceSet(gradle_plugin)
     plugins {
         create("io.atlasgo.hibernate-provider") {
             website = "https://github.com/ariga/atlas-provider-hibernate"
@@ -40,7 +52,7 @@ gradlePlugin {
             displayName = "Atlas Hibernate Provider"
             tags = listOf("database", "hibernate", "atlas", "migrations", "schema")
             id = "io.atlasgo.hibernate-provider"
-            implementationClass = "io.atlasgo.HibernateProvider"
+            implementationClass = "io.atlasgo.gradle_plugin.HibernateProvider"
         }
     }
 }
@@ -56,7 +68,6 @@ publishing {
 
 dependencies {
     compileOnly("org.hibernate.orm:hibernate-core:6.1.7.Final")
-    implementation(gradleApi())
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     runtimeOnly(kotlin("stdlib"))
 
@@ -64,6 +75,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
     testImplementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     testImplementation("com.h2database:h2:2.2.224")
+
+    gradleConf(gradleApi())
 }
 
 tasks.test {
