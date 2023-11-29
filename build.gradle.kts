@@ -69,6 +69,10 @@ dependencies {
     testImplementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     testImplementation("com.h2database:h2:2.2.224")
 
+    implementation("org.codehaus.mojo:exec-maven-plugin:3.1.1")
+    implementation("org.apache.maven:maven-plugin-api:3.6.3")
+    implementation("org.apache.maven:maven-project:2.2.1")
+    implementation("org.apache.maven.plugin-tools:maven-plugin-annotations:3.6.0")
 }
 
 tasks.test {
