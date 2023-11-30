@@ -1,0 +1,3 @@
+create table Location (id bigint not null, primary key (id)) engine=InnoDB;
+create table Location_SEQ (next_val bigint) engine=InnoDB;
+insert into Location_SEQ values ( 1 );

@@ -1,0 +1,5 @@
+create sequence Location_SEQ start with 1 increment by 50;
+create table Department (id bigserial not null, name varchar(255), primary key (id));
+create table Employee (id bigserial not null, name varchar(255), department_id bigint, primary key (id));
+create table Location (id bigint not null, primary key (id));
+alter table Employee add constraint FK14tijxqry9ml17nk86sqfp561 foreign key (department_id) references Department;

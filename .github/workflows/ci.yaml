@@ -23,8 +23,23 @@ jobs:
         run: |
           cd examples/maven_project_example
           mvn compile --batch-mode
-          mvn -q io.atlasgo:hibernate-provider-maven-plugin:0.1:schema -Dexec.classpathScope=runtime | tee maven_schema_output
+          mvn -q hibernate-provider:schema | tee maven_schema_output
           diff maven_schema_output src/test/expected_default_schema
+          
+          mvn -q hibernate-provider:schema@schema-using-postgresql-properties | tee maven_psql_output
+          diff maven_psql_output src/test/expected_postgresql_output
+          
+          mvn -q hibernate-provider:schema -Dregistry-builder=com.example.H2ServiceRegistryBuilder | tee maven_h2_output
+          diff maven_h2_output src/test/expected_h2_output
+          
+          mvn -q hibernate-provider:schema -Dmetadata-builder=com.example.MetadataBuilder | tee maven_mini_output
+          diff maven_mini_output src/test/expected_mini_output
+          
+          mvn -q hibernate-provider:schema -Dpackages="com.example.model" | tee maven_employee_output
+          diff maven_employee_output src/test/expected_employee_output
+          
+          mvn -q hibernate-provider:schema -Dpackages="com.example.model" -Dclasses="com.example.minimodel.Location" | tee maven_classes_and_packages_output
+          diff maven_classes_and_packages_output src/test/expected_default_schema
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.4.2

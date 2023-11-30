@@ -40,6 +40,18 @@
                     <groupId>io.atlasgo</groupId>
                     <artifactId>hibernate-provider-maven-plugin</artifactId>
                     <version>0.1</version>
+                    <executions>
+                        <execution>
+                            <id>schema-using-postgresq-properties</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>schema</goal>
+                            </goals>
+                            <configuration>
+                                <properties>postgresql.properties</properties>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
