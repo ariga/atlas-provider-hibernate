@@ -17,12 +17,11 @@ jobs:
 
       - name: Build Maven Plugin
         run: |
-          mvn clean install --batch-mode -X
+          mvn clean install --batch-mode -e
 
       - name: Integration tests with maven plugin
         run: |
           cd examples/maven_project_example
-          mvn --version
           mvn compile io.atlasgo:hibernate-provider-maven-plugin:0.1:schema -Dexec.classpathScope=runtime
 
       - name: Setup Gradle
