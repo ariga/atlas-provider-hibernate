@@ -54,6 +54,15 @@ jobs:
               echo "error string found"
           fi
 
+      - name: Build Maven Plugin
+        run: |
+          mvn clean install
+
+      - name: Integration tests with maven plugin
+        run: |
+          cd examples/maven_project_example
+          mvn compile io.atlasgo:hibernate-provider-maven-plugin:0.1:schema -Dexec.classpathScope=runtime -q
+
       - uses: actions/setup-java@v3
         with:
           distribution: zulu
