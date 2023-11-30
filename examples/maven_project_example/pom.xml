@@ -32,4 +32,16 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.atlasgo</groupId>
+                    <artifactId>hibernate-provider-maven-plugin</artifactId>
+                    <version>0.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
