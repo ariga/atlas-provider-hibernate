@@ -31,6 +31,10 @@ kotlin {
     }
 }
 
+sourceSets.main {
+    java.srcDir("src/gradle/kotlin")
+}
+
 gradlePlugin {
     plugins {
         create("io.atlasgo.hibernate-provider") {
@@ -40,7 +44,7 @@ gradlePlugin {
             displayName = "Atlas Hibernate Provider"
             tags = listOf("database", "hibernate", "atlas", "migrations", "schema")
             id = "io.atlasgo.hibernate-provider"
-            implementationClass = "io.atlasgo.HibernateProvider"
+            implementationClass = "io.atlasgo.gradle.HibernateProvider"
         }
     }
 }
@@ -64,6 +68,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
     testImplementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     testImplementation("com.h2database:h2:2.2.224")
+
 }
 
 tasks.test {

@@ -1,4 +1,4 @@
-import io.atlasgo.SchemaTask
+import io.atlasgo.gradle.SchemaTask
 
 plugins {
     application
