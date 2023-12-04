@@ -1,7 +1,3 @@
-create table event (id bigint not null, title varchar(255), primary key (id)) engine=InnoDB;
-create table event_seq (next_val bigint) engine=InnoDB;
-insert into event_seq values ( 1 );
+create table event (id bigint not null auto_increment, title varchar(255), primary key (id)) engine=InnoDB;
 create table location (id bigint not null auto_increment, title varchar(255), primary key (id)) engine=InnoDB;
-create table other_event_seq (next_val bigint) engine=InnoDB;
-insert into other_event_seq values ( 1 );
-create table other_event (id bigint not null, title varchar(255), primary key (id)) engine=InnoDB;
+create table other_event (id bigint not null auto_increment, title varchar(255), primary key (id)) engine=InnoDB;

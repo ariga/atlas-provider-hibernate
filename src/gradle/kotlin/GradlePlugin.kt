@@ -45,6 +45,10 @@ abstract class SchemaTask : JavaExec() {
     @Option(option = "properties", description = "Optional properties file name, must be in classpath")
     open var propertiesFile: String = ""
 
+    @Input
+    @Option(option = "enable-table-generators", description = "Enables some GenerationType (primarily SEQUENCE and TABLE) which are disabled by default")
+    open var enableTableGenerators = false
+
     init {
         project.javaPlugin?.let { javaPlugin ->
             classpath = project.files(
@@ -84,6 +88,9 @@ abstract class SchemaTask : JavaExec() {
         }
         if (propertiesFile.isNotEmpty()) {
             args += listOf("--properties", propertiesFile)
+        }
+        if (enableTableGenerators) {
+            args += "--enable-table-generators"
         }
         this.args = args
         super.exec()

@@ -8,7 +8,7 @@ import jakarta.persistence.Id
 @Entity
 class OtherPackageEvent {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
     var title: String = "1234"
