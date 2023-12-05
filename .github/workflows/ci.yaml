@@ -83,7 +83,7 @@ jobs:
           mvn -q hibernate-provider:schema -Dpackages="com.example.model" -Dclasses="com.example.minimodel.Location" | tee maven_classes_and_packages_output
           diff maven_classes_and_packages_output src/test/expected_default_schema
 
-          cd forbidden_types
+          cd ../forbidden_types
           if (set -o pipefail && atlas schema inspect --env hibernate --url env://src 2>&1 | tee /tmp/forbidden_output); then
             echo "expected schema extraction to fail due to an unsupported SQL command" && false
           else
