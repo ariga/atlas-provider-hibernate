@@ -4,12 +4,6 @@
         "http://www.hibernate.org/dtd/hibernate-configuration">
 <hibernate-configuration>
     <session-factory>
-
-<!--        <property name="connection.url">jdbc:mysql://localhost:3306/mydatabase</property>-->
-<!--        <property name="connection.username">root</property>-->
-<!--        <property name="connection.password">my-secret-pw</property>-->
-<!--        <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>-->
-
         <property name="connection.url">jdbc:postgresql://localhost:5432/postgres</property>
         <property name="connection.username">postgres</property>
         <property name="connection.password">password</property>
