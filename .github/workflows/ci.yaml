@@ -16,7 +16,7 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
 
       - name: Setup Atlas
         uses: ariga/setup-atlas@master
@@ -42,6 +42,17 @@ jobs:
           ./gradlew -q schema | tee schema_output
           diff schema_output src/test/expected_default_schema
           ./gradlew integrationTests
+
+      - name: Integration tests with unsupported schema
+        run: |
+          cd examples/with_forbidden_generation_type
+          if (set -o pipefail && atlas schema inspect --env hibernate --url env://src 2>&1 | tee /tmp/forbidden_output); then
+              echo "expected schema extraction to fail due to an unsupported SQL command" && false
+          else
+              echo "command failed successfully, checking output contains error string"
+              grep -i "unsupported.sql.command" /tmp/forbidden_output || (echo "Failed output comparison, output was:" && cat /tmp/forbidden_output && false)
+              echo "error string found"
+          fi
 
       - uses: actions/setup-java@v3
         with:
