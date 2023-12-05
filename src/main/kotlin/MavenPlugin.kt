@@ -11,6 +11,7 @@ import java.io.File
 import java.lang.ProcessBuilder.Redirect
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.system.exitProcess
 
 @Mojo(name = "schema", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.COMPILE)
 internal class ExportSchemaMojo : AbstractMojo() {
@@ -35,8 +36,14 @@ internal class ExportSchemaMojo : AbstractMojo() {
     @Parameter(property = "metadata-builder")
     private var metadataBuilderClass = ""
 
+    @Parameter(property = "debug")
+    private var debugEnabled = false
+
     override fun execute() {
         val args = mutableListOf("java")
+        if (debugEnabled) {
+            args += listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005")
+        }
         args += listOf("-cp", buildClasspath())
         args += ExportSchemaMain::class.java.name
         if (registryBuilderClass.isNotBlank()) {
@@ -55,12 +62,15 @@ internal class ExportSchemaMojo : AbstractMojo() {
         } else {
             args += listOf("--metadata-builder", metadataBuilderClass)
         }
-        ProcessBuilder()
+        val exitCode = ProcessBuilder()
             .command(args)
             .redirectOutput(Redirect.INHERIT)
             .redirectError(Redirect.INHERIT)
             .start()
             .waitFor()
+        if (exitCode != 0) {
+            exitProcess(exitCode)
+        }
     }
 
     private val scannedClasspath: List<String> by lazy {

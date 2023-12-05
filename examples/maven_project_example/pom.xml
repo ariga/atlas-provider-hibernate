@@ -31,6 +31,11 @@
             <version>2.2.224</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -43,7 +48,7 @@
                     <executions>
                         <execution>
                             <id>schema-using-postgresq-properties</id>
-                            <phase>test</phase>
+                            <phase>compile</phase>
                             <goals>
                                 <goal>schema</goal>
                             </goals>
