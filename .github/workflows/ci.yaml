@@ -62,6 +62,8 @@ jobs:
         run: |
           cd examples/maven_project_example
           mvn compile --batch-mode
+
+          cd allowed_types
           set -x
           mvn -q hibernate-provider:schema | tee maven_schema_output 
           diff maven_schema_output src/test/expected_default_schema
@@ -80,6 +82,15 @@ jobs:
 
           mvn -q hibernate-provider:schema -Dpackages="com.example.model" -Dclasses="com.example.minimodel.Location" | tee maven_classes_and_packages_output
           diff maven_classes_and_packages_output src/test/expected_default_schema
+
+          cd forbidden_types
+          if (set -o pipefail && atlas schema inspect --env hibernate --url env://src 2>&1 | tee /tmp/forbidden_output); then
+            echo "expected schema extraction to fail due to an unsupported SQL command" && false
+          else
+            echo "command failed successfully, checking output contains error string"
+            grep -i "unsupported GenerationType.SEQUENCE" /tmp/forbidden_output || (echo "Failed output comparison, output was:" && cat /tmp/forbidden_output && false)
+            echo "error string found"
+          fi
           set +x
 
       - uses: actions/setup-java@v3

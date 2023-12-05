@@ -39,6 +39,9 @@ internal class ExportSchemaMojo : AbstractMojo() {
     @Parameter(property = "debug")
     private var debugEnabled = false
 
+    @Parameter(property = "enable-table-generators")
+    private var enableTableGenerators = false
+
     override fun execute() {
         val args = mutableListOf("java")
         if (debugEnabled) {
@@ -51,6 +54,9 @@ internal class ExportSchemaMojo : AbstractMojo() {
         }
         if (properties.isNotBlank()) {
             args += listOf("--properties", properties)
+        }
+        if (enableTableGenerators) {
+            args += "--enable-table-generators"
         }
         if (metadataBuilderClass.isEmpty()) {
             if (classes.isNotEmpty()) {
