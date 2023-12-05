@@ -1,6 +1,4 @@
 create table Department (id bigint not null auto_increment, name varchar(255), primary key (id)) engine=InnoDB;
 create table Employee (id bigint not null auto_increment, name varchar(255), department_id bigint, primary key (id)) engine=InnoDB;
-create table Location (id bigint not null, primary key (id)) engine=InnoDB;
-create table Location_SEQ (next_val bigint) engine=InnoDB;
-insert into Location_SEQ values ( 1 );
+create table Location (id bigint not null auto_increment, primary key (id)) engine=InnoDB;
 alter table Employee add constraint FK14tijxqry9ml17nk86sqfp561 foreign key (department_id) references Department (id);
