@@ -13,9 +13,6 @@ repositories {
 }
 
 dependencies {
-//    implementation("org.hibernate.orm:hibernate-core:6.1.7.Final")
-//    implementation("org.hibernate.orm:hibernate-core:6.2.14.Final")
-//    implementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     implementation("org.hibernate.orm:hibernate-core:6.4.0.Final")
 }
 
