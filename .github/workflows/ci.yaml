@@ -62,7 +62,8 @@ jobs:
         run: |
           cd examples/maven_project_example
           mvn compile --batch-mode
-          mvn -q hibernate-provider:schema | tee maven_schema_output
+          set -x
+          mvn -q hibernate-provider:schema | tee maven_schema_output 
           diff maven_schema_output src/test/expected_default_schema
 
           mvn -q hibernate-provider:schema@schema-using-postgresql-properties | tee maven_psql_output
@@ -79,7 +80,7 @@ jobs:
 
           mvn -q hibernate-provider:schema -Dpackages="com.example.model" -Dclasses="com.example.minimodel.Location" | tee maven_classes_and_packages_output
           diff maven_classes_and_packages_output src/test/expected_default_schema
-
+          set +x
 
       - uses: actions/setup-java@v3
         with:
