@@ -1,11 +1,8 @@
 -- Create "Location" table
 CREATE TABLE `Location` (
-  `id` bigint NOT NULL,
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NULL,
   PRIMARY KEY (`id`)
-) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
--- Create "Location_SEQ" table
-CREATE TABLE `Location_SEQ` (
-  `next_val` bigint NULL
 ) CHARSET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 -- Create "Department" table
 CREATE TABLE `Department` (
