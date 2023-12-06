@@ -106,6 +106,6 @@ jobs:
 
       - name: E2E test maven project
         run: |
-          cd examples/maven_project_example
+          cd examples/maven_project_example/allowed_types
           output=$(atlas migrate diff --env hibernate)
           [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
