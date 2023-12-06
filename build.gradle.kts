@@ -16,10 +16,6 @@ repositories {
     mavenCentral()
 }
 
-tasks.withType<ShadowJar> {
-    archiveClassifier = null
-}
-
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -31,13 +27,33 @@ kotlin {
     }
 }
 
-sourceSets.main {
-    java.srcDir("src/gradle/kotlin")
+val gradleConf by configurations.creating {
+    extendsFrom(configurations.implementation.get())
+}
+
+val mavenConf by configurations.creating {
+    extendsFrom(configurations.implementation.get())
+}
+
+val maven by sourceSets.creating {
+    compileClasspath += mavenConf + sourceSets.main.get().output
+    runtimeClasspath += mavenConf + sourceSets.main.get().output
+}
+
+val gradle by sourceSets.creating {
+    compileClasspath += gradleConf + sourceSets.main.get().output
+    runtimeClasspath += gradleConf + sourceSets.main.get().output
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    archiveClassifier = null
+    from(gradle.output)
 }
 
 gradlePlugin {
+    pluginSourceSet(gradle)
     plugins {
-        create("io.atlasgo.hibernate-provider") {
+        create("hibernate-provider-plugin") {
             website = "https://github.com/ariga/atlas-provider-hibernate"
             vcsUrl = "https://github.com/ariga/atlas-provider-hibernate.git"
             description = "Atlas plugin, used as a database schema provider to Atlas."
@@ -60,7 +76,6 @@ publishing {
 
 dependencies {
     compileOnly("org.hibernate.orm:hibernate-core:6.1.7.Final")
-    implementation(gradleApi())
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     runtimeOnly(kotlin("stdlib"))
 
@@ -69,11 +84,11 @@ dependencies {
     testImplementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     testImplementation("com.h2database:h2:2.2.224")
 
-    // These are here for now just for editor support. The maven plugin is built using Maven
-    compileOnly("org.codehaus.mojo:exec-maven-plugin:3.1.1")
-    compileOnly("org.apache.maven:maven-plugin-api:3.6.3")
-    compileOnly("org.apache.maven:maven-project:2.2.1")
-    compileOnly("org.apache.maven.plugin-tools:maven-plugin-annotations:3.6.0")
+    mavenConf("org.codehaus.mojo:exec-maven-plugin:3.1.1")
+    mavenConf("org.apache.maven:maven-plugin-api:3.6.3")
+    mavenConf("org.apache.maven:maven-project:2.2.1")
+    mavenConf("org.apache.maven.plugin-tools:maven-plugin-annotations:3.6.0")
+    gradleConf(gradleApi())
 }
 
 tasks.test {
