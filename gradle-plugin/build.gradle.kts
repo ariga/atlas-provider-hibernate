@@ -27,31 +27,11 @@ kotlin {
     }
 }
 
-val gradleConf by configurations.creating {
-    extendsFrom(configurations.implementation.get())
-}
-
-val mavenConf by configurations.creating {
-    extendsFrom(configurations.implementation.get())
-}
-
-val maven by sourceSets.creating {
-    compileClasspath += mavenConf + sourceSets.main.get().output
-    runtimeClasspath += mavenConf + sourceSets.main.get().output
-}
-
-val gradle by sourceSets.creating {
-    compileClasspath += gradleConf + sourceSets.main.get().output
-    runtimeClasspath += gradleConf + sourceSets.main.get().output
-}
-
 tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier = null
-    from(gradle.output)
 }
 
 gradlePlugin {
-    pluginSourceSet(gradle)
     plugins {
         create("hibernate-provider-plugin") {
             website = "https://github.com/ariga/atlas-provider-hibernate"
@@ -69,7 +49,7 @@ publishing {
     repositories {
         maven {
             name = "localPluginRepository"
-            url = uri(".local-plugin-repository")
+            url = uri("../.local-plugin-repository")
         }
     }
 }
@@ -77,18 +57,9 @@ publishing {
 dependencies {
     compileOnly("org.hibernate.orm:hibernate-core:6.1.7.Final")
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
+    implementation(gradleApi())
+    implementation(project(":provider"))
     runtimeOnly(kotlin("stdlib"))
-
-    testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
-    testImplementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
-    testImplementation("com.h2database:h2:2.2.224")
-
-    mavenConf("org.codehaus.mojo:exec-maven-plugin:3.1.1")
-    mavenConf("org.apache.maven:maven-plugin-api:3.6.3")
-    mavenConf("org.apache.maven:maven-project:2.2.1")
-    mavenConf("org.apache.maven.plugin-tools:maven-plugin-annotations:3.6.0")
-    gradleConf(gradleApi())
 }
 
 tasks.test {
