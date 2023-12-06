@@ -54,6 +54,45 @@ jobs:
               echo "error string found"
           fi
 
+      - name: Build Maven Plugin
+        run: |
+          mvn clean install --batch-mode 
+
+      - name: Integration tests with maven plugin
+        run: |
+          cd examples/maven_project_example
+          mvn compile --batch-mode
+
+          cd allowed_types
+          set -x
+          mvn -q hibernate-provider:schema | tee maven_schema_output 
+          diff maven_schema_output src/test/expected_default_schema
+
+          mvn -q hibernate-provider:schema@schema-using-postgresql-properties | tee maven_psql_output
+          diff maven_psql_output src/test/expected_postgresql_output
+
+          mvn -q hibernate-provider:schema -Dregistry-builder=com.example.H2ServiceRegistryBuilder | tee maven_h2_output
+          diff maven_h2_output src/test/expected_h2_output
+
+          mvn -q hibernate-provider:schema -Dmetadata-builder=com.example.MetadataBuilder | tee maven_mini_output
+          diff maven_mini_output src/test/expected_mini_output
+
+          mvn -q hibernate-provider:schema -Dpackages="com.example.model" | tee maven_employee_output
+          diff maven_employee_output src/test/expected_employee_output
+
+          mvn -q hibernate-provider:schema -Dpackages="com.example.model" -Dclasses="com.example.minimodel.Location" | tee maven_classes_and_packages_output
+          diff maven_classes_and_packages_output src/test/expected_default_schema
+
+          cd ../forbidden_types
+          if (set -o pipefail && atlas schema inspect --env hibernate --url env://src 2>&1 | tee /tmp/forbidden_output); then
+            echo "expected schema extraction to fail due to an unsupported SQL command" && false
+          else
+            echo "command failed successfully, checking output contains error string"
+            grep -i "unsupported GenerationType.SEQUENCE" /tmp/forbidden_output || (echo "Failed output comparison, output was:" && cat /tmp/forbidden_output && false)
+            echo "error string found"
+          fi
+          set +x
+
       - uses: actions/setup-java@v3
         with:
           distribution: zulu
@@ -62,5 +101,11 @@ jobs:
       - name: E2E test spring project
         run: |
           cd examples/with_spring_gradle
+          output=$(atlas migrate diff --env hibernate)
+          [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
+
+      - name: E2E test maven project
+        run: |
+          cd examples/maven_project_example/allowed_types
           output=$(atlas migrate diff --env hibernate)
           [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
