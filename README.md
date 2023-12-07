@@ -20,7 +20,7 @@ See [atlasgo.io](https://atlasgo.io/getting-started#installation) for more insta
 Add the provider to your gradle project:
 ```kotlin
 plugins {
-   id("io.atlasgo.hibernate-provider") version "0.1"
+   id("io.atlasgo.hibernate-provider-gradle-plugin") version "0.1"
 }
 ```
 

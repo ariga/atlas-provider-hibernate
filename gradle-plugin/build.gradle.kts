@@ -27,19 +27,24 @@ kotlin {
     }
 }
 
+tasks.withType<Jar> {
+    archiveBaseName = "hibernate-provider-gradle-plugin"
+}
+
 tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier = null
+    archiveBaseName = "hibernate-provider-gradle-plugin"
 }
 
 gradlePlugin {
     plugins {
-        create("io.atlasgo.hibernate-provider") {
+        create("io.atlasgo.hibernate-provider-gradle-plugin") {
             website = "https://github.com/ariga/atlas-provider-hibernate"
             vcsUrl = "https://github.com/ariga/atlas-provider-hibernate.git"
             description = "Atlas plugin, used as a database schema provider to Atlas."
             displayName = "Atlas Hibernate Provider"
             tags = listOf("database", "hibernate", "atlas", "migrations", "schema")
-            id = "io.atlasgo.hibernate-provider"
+            id = "io.atlasgo.hibernate-provider-gradle-plugin"
             implementationClass = "io.atlasgo.gradle.HibernateProvider"
         }
     }
@@ -58,7 +63,7 @@ dependencies {
     compileOnly("org.hibernate.orm:hibernate-core:6.1.7.Final")
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     implementation(gradleApi())
-    implementation(project(":provider"))
+    implementation(project(":hibernate-provider"))
     runtimeOnly(kotlin("stdlib"))
 }
 
