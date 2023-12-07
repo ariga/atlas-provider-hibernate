@@ -45,6 +45,7 @@ jobs:
 
       - name: Build Maven Plugin
         run: |
+          cd maven-plugin
           mvn clean install --batch-mode 
 
       - name: Integration tests with maven plugin
