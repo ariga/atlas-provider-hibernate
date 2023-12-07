@@ -69,7 +69,7 @@
                         <configuration>
                             <sources>
                                 <source>src/main/kotlin</source>
-                                <source>../provider/src/main/kotlin</source>
+                                <source>../hibernate-provider/src/main/kotlin</source>
                             </sources>
                         </configuration>
                     </execution>
