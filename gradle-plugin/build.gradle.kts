@@ -33,7 +33,7 @@ tasks.named<ShadowJar>("shadowJar") {
 
 gradlePlugin {
     plugins {
-        create("hibernate-provider-plugin") {
+        create("io.atlasgo.hibernate-provider") {
             website = "https://github.com/ariga/atlas-provider-hibernate"
             vcsUrl = "https://github.com/ariga/atlas-provider-hibernate.git"
             description = "Atlas plugin, used as a database schema provider to Atlas."
