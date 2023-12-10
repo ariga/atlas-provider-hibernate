@@ -59,13 +59,13 @@ publishing {
                         url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
                     }
                 }
-//                developers {
-//                    developer {
-//                        id = "johnd"
-//                        name = "John Doe"
-//                        email = "john.doe@example.com"
-//                    }
-//                }
+                developers {
+                    developer {
+                        id = "Ariga it"
+                        name = "Ariga it"
+                        email = "it@ariga.io"
+                    }
+                }
                 scm {
                     connection = "scm:git:git://github.com/ariga/atlas-provider-hibernate.git"
                     developerConnection = "scm:git:ssh://github.com/ariga/atlas-provider-hibernate.git"

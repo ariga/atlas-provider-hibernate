@@ -37,7 +37,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.system.exitProcess
 
-private const val linkToGuide = "https://atlasgo.io/guides/orms/hibernate"
+private const val linkToGuide = "https://atlasgo.io/guides/orms/hibernate#usage"
 
 class ConsoleGenerationTarget(
         private val writer: OutputStream = System.out,
