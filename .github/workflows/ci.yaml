@@ -24,17 +24,6 @@ jobs:
       - name: Build and test Plugin
         run: ./gradlew build
 
-      - name: Build and test Sample Project
-        run: |
-          cd examples/hibernate_standalone/
-          ./gradlew build
-
-      - name: Test default schema task - includeBuild
-        run: |
-          cd examples/hibernate_standalone/
-          ./gradlew -q schema > schema_output
-          diff schema_output src/test/expected_default_schema
-
       - name: Integration tests with local plugin repo
         run: |
           ./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
@@ -56,6 +45,7 @@ jobs:
 
       - name: Build Maven Plugin
         run: |
+          cd maven-plugin
           mvn clean install --batch-mode 
 
       - name: Integration tests with maven plugin

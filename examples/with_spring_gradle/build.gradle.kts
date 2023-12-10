@@ -27,5 +27,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.0") {
         exclude(module="logback-classic")
     }
+    implementation("org.slf4j:slf4j-log4j12:2.0.9")
     runtimeOnly("com.mysql:mysql-connector-j")
 }
