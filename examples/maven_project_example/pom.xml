@@ -48,12 +48,42 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>1.9.20</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>io.atlasgo</groupId>
                     <artifactId>hibernate-provider-maven-plugin</artifactId>
                     <version>0.1</version>
+                    <executions>
+                        <execution>
+                            <id>schema-using-postgresq-properties</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>schema</goal>
+                            </goals>
+                            <configuration>
+                                <properties>postgresql.properties</properties>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

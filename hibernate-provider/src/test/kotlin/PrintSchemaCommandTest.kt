@@ -138,17 +138,17 @@ class PrintSchemaCommandTest {
         assertFailsWith<UnsupportedGenerationType> {
             command.test("--properties hibernate.properties --classes ${WithGenerationTypeSequence::class.java.name}")
         }.also {
-            assertEquals("unsupported GenerationType.SEQUENCE found for entity 'WithGenerationTypeSequence. See https://atlasgo.io/guides/orms/hibernate#usage", it.message)
+            assertEquals("unsupported GenerationType.SEQUENCE found for entity 'WithGenerationTypeSequence. See https://atlasgo.io/guides/orms/hibernate", it.message)
         }
         assertFailsWith<UnsupportedGenerationType> {
             command.test("--properties hibernate.properties --classes ${WithGenerationTypeTable::class.java.name}")
         }.also {
-            assertEquals("unsupported GenerationType.TABLE found for entity 'WithGenerationTypeTable. See https://atlasgo.io/guides/orms/hibernate#usage", it.message)
+            assertEquals("unsupported GenerationType.TABLE found for entity 'WithGenerationTypeTable. See https://atlasgo.io/guides/orms/hibernate", it.message)
         }
         assertFailsWith<UnsupportedGenerationType> {
             command.test("--properties hibernate.properties --classes ${WithGenerationTypeAuto::class.java.name}")
         }.also {
-            assertEquals("unsupported GenerationType.AUTO found for entity 'WithGenerationTypeAuto. See https://atlasgo.io/guides/orms/hibernate#usage", it.message)
+            assertEquals("unsupported GenerationType.AUTO found for entity 'WithGenerationTypeAuto. See https://atlasgo.io/guides/orms/hibernate", it.message)
         }
         // Not throwing
         command.test("--properties hibernate.properties --classes ${WithoutGenerationType::class.java.name}")
