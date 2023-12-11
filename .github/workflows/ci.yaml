@@ -24,9 +24,8 @@ jobs:
       - name: Setup Gradle Signing
         run: |
           echo "signing.keyId=BB19097D" >> ~/.gradle/gradle.properties
-          echo "signing.password=${{ secrets.gpg_key }}" >> ~/.gradle/gradle.properties
-          echo "signing.secretKeyRingFile=/tmp/private-key.gpg" >> ~/.gradle/gradle.properties
-          echo "${{ secrets.gpg_private_key_base64 }}" | base64 --decode > /tmp/private-key.gpg
+          echo "signing.password=${{ secrets.GPG_PASSPHRASE }}" >> ~/.gradle/gradle.properties
+          echo "signing.secretKeyRingFile=/tmp/gpg.key" >> ~/.gradle/gradle.properties
 
       - name: Setup Atlas
         uses: ariga/setup-atlas@master
@@ -114,4 +113,4 @@ jobs:
         if: always()
         run: |
           rm ~/.gradle/gradle.properties
-          rm /tmp/private-key.gpg
+          rm /tmp/gpg.key
