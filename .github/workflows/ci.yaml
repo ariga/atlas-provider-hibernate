@@ -14,6 +14,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
+          gpg-private-key: ${{ secrets.gpg_key }}
+          gpg-passphrase: ${{ secrets.gpg_passphrase }}
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.4.2
@@ -46,7 +48,7 @@ jobs:
       - name: Build Maven Plugin
         run: |
           cd maven-plugin
-          mvn clean install --batch-mode 
+          mvn clean install -Dgpg.passphrase='${{ secrets.gpg_passphrase }}' --batch-mode 
 
       - name: Integration tests with maven plugin
         run: |
