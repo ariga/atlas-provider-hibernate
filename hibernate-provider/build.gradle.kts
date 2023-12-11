@@ -62,8 +62,8 @@ publishing {
                 }
                 developers {
                     developer {
-                        id = "Ariga it"
-                        name = "Ariga it"
+                        id = "Ariga"
+                        name = "Ariga"
                         email = "it@ariga.io"
                     }
                 }
