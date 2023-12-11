@@ -20,6 +20,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.4.2
 
+      - name: Setup Gradle Signing
+        run: |
+          echo "signing.keyId=BB19097D" >> ~/.gradle/gradle.properties
+          echo "signing.password=${{ secrets.gpg_key }}" >> ~/.gradle/gradle.properties
+          echo "signing.secretKeyRingFile=/tmp/private-key.gpg" >> ~/.gradle/gradle.properties
+          echo "${{ secrets.gpg_private_key_base64 }}" | base64 --decode > /tmp/private-key.gpg
+
       - name: Setup Atlas
         uses: ariga/setup-atlas@master
 
@@ -101,3 +108,9 @@ jobs:
           cd examples/maven_project_example/allowed_types
           output=$(atlas migrate diff --env hibernate)
           [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm ~/.gradle/gradle.properties
+          rm /tmp/private-key.gpg

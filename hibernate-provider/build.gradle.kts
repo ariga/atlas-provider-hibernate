@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `java-library`
+    signing
     id("com.gradle.plugin-publish") version "1.1.0"
     kotlin("jvm") version "1.9.20"
 }
@@ -74,6 +75,10 @@ publishing {
                 }
             }
         }
+    }
+
+    signing {
+        sign(publishing.publications["hibernate-provider"])
     }
 
     repositories {
