@@ -10,12 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: |
+        echo "${{ secrets.GPG_PRIVATE_KEY_BASE64 }}" | base64 --decode > /tmp/gpg.key
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
-          gpg-private-key: ${{ secrets.gpg_key }}
-          gpg-passphrase: ${{ secrets.gpg_passphrase }}
+          gpg-private-key: /tmp/gpg.key
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.4.2
