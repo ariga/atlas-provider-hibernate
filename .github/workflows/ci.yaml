@@ -40,6 +40,7 @@ jobs:
 
       - name: Integration tests with local plugin repo
         run: |
+          false
           ./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
           cd examples/with_local_plugin_repository
           ./gradlew -q schema | tee schema_output
