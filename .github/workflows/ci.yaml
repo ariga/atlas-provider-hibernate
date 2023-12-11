@@ -35,18 +35,6 @@ jobs:
           echo "gradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}" >> ~/.gradle/gradle.properties
           sed "s@MAVEN_CENTRAL_PASSWORD@${{ secrets.OSSRH_PASSWORD }}@" maven-plugin/settings.xml.tmpl | sed "s@MAVEN_CENTRAL_USERNAME@${{ secrets.OSSRH_USERNAME }}@" > maven-plugin/settings.xml
 
-      - name: Release
-        #        if: github.event_name == 'workflow_dispatch'
-        run: |
-          export INPUT_PROVIDER_VERSION=${{ inputs.provider-version }}
-          export PROVIDER_VERSION=${INPUT_PROVIDER_VERSION:-"0.3.4"}
-          cd hibernate-provider
-          ./gradlew publishPluginMavenPublicationToOssrhRepository
-          cd ../gradle-plugin
-          ./gradlew publishPlugins
-          cd ../maven-plugin
-          mvn clean deploy -Dprovider.version=$PROVIDER_VERSION -Dpassphrase=${{ secrets.GPG_PASSPHRASE }} -s settings.xml
-
       - name: Setup Atlas
         uses: ariga/setup-atlas@master
 
@@ -55,7 +43,6 @@ jobs:
 
       - name: Integration tests with local plugin repo
         run: |
-          false
           ./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
           cd examples/with_local_plugin_repository
           ./gradlew -q schema | tee schema_output
@@ -129,6 +116,17 @@ jobs:
           cd examples/maven_project_example/allowed_types
           output=$(atlas migrate diff --env hibernate)
           [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
+
+      - name: Release
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          export PROVIDER_VERSION=${{ inputs.provider-version }}
+          cd hibernate-provider
+          ./gradlew publishPluginMavenPublicationToOssrhRepository
+          cd ../gradle-plugin
+          ./gradlew publishPlugins
+          cd ../maven-plugin
+          mvn clean deploy --batch-mode -Dprovider.version=$PROVIDER_VERSION -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} -s settings.xml
 
       - name: Cleanup
         if: always()
