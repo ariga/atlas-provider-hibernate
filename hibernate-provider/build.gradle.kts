@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.atlasgo"
-version = "0.1"
+version = System.getenv("PROVIDER_VERSION")
 
 repositories {
     mavenCentral()

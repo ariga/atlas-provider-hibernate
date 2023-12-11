@@ -5,20 +5,27 @@ on:
       - master
   pull_request:
   workflow_dispatch:
-jobs: 
+    inputs:
+      version:
+        type: string
+        description: the version to publish
+jobs:
   gradle:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Release
-        if: github.event_name == 'workflow_dispatch'
+#        if: github.event_name == 'workflow_dispatch'
         run: |
+          export INPUT_PROVIDER_VERSION=${{ inputs.provider-version }}
+          EFFECTIVE_VERSION=${INPUT_PROVIDER_VERSION:-"0.0-SNAPSHOT"}
+          echo "DORAV - $INPUT_PROVIDER_VERSION $EFFECTIVE_VERSION"
           cd hibernate-provider
           ./gradlew publishPluginMavenPublicationToOssrhRepository
           cd ../gradle-plugin
           ./gradlew publishPlugins
           cd ../maven-plugin
-          mvn clean deploy -Dpassphrase=${{ secrets.GPG_PASSPHRASE }}
+          mvn clean deploy -Dprovider.version=${{ inputs.provider-version }} -Dpassphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - uses: actions/setup-java@v3
         with:
