@@ -14,19 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Release
-#        if: github.event_name == 'workflow_dispatch'
-        run: |
-          export INPUT_PROVIDER_VERSION=${{ inputs.provider-version }}
-          EFFECTIVE_VERSION=${INPUT_PROVIDER_VERSION:-"0.3"}
-          echo "DORAV - $INPUT_PROVIDER_VERSION $EFFECTIVE_VERSION"
-          cd hibernate-provider
-          ./gradlew publishPluginMavenPublicationToOssrhRepository
-          cd ../gradle-plugin
-          ./gradlew publishPlugins
-          cd ../maven-plugin
-          mvn clean deploy -Dprovider.version=${{ inputs.provider-version }} -Dpassphrase=${{ secrets.GPG_PASSPHRASE }}
-
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
@@ -42,7 +29,22 @@ jobs:
           echo "signing.keyId=BB19097D" >> ~/.gradle/gradle.properties
           echo "signing.password=${{ secrets.GPG_PASSPHRASE }}" >> ~/.gradle/gradle.properties
           echo "signing.secretKeyRingFile=/tmp/gpg.key" >> ~/.gradle/gradle.properties
+          echo "ossrhUsername=${{ secrets.OSSRH_USERNAME }}" >> ~/.gradle/gradle.properties
+          echo "ossrhPassword=${{ secrets.OSSRH_PASSWORD }}" >> ~/.gradle/gradle.properties
           echo "DORAV - ${{ github.event_name }}"
+
+      - name: Release
+        #        if: github.event_name == 'workflow_dispatch'
+        run: |
+          export INPUT_PROVIDER_VERSION=${{ inputs.provider-version }}
+          EFFECTIVE_VERSION=${INPUT_PROVIDER_VERSION:-"0.3"}
+          echo "DORAV - $INPUT_PROVIDER_VERSION $EFFECTIVE_VERSION"
+          cd hibernate-provider
+          ./gradlew publishPluginMavenPublicationToOssrhRepository
+          cd ../gradle-plugin
+          ./gradlew publishPlugins
+          cd ../maven-plugin
+          mvn clean deploy -Dprovider.version=${{ inputs.provider-version }} -Dpassphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - name: Setup Atlas
         uses: ariga/setup-atlas@master
