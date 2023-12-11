@@ -10,8 +10,6 @@ plugins {
 group = "io.atlasgo"
 version = System.getenv("PROVIDER_VERSION")
 
-println("DORAV - provider version = $version")
-
 repositories {
     mavenCentral()
 }
