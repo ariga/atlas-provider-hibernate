@@ -18,7 +18,7 @@ jobs:
 #        if: github.event_name == 'workflow_dispatch'
         run: |
           export INPUT_PROVIDER_VERSION=${{ inputs.provider-version }}
-          EFFECTIVE_VERSION=${INPUT_PROVIDER_VERSION:-"0.0-SNAPSHOT"}
+          EFFECTIVE_VERSION=${INPUT_PROVIDER_VERSION:-"0.3"}
           echo "DORAV - $INPUT_PROVIDER_VERSION $EFFECTIVE_VERSION"
           cd hibernate-provider
           ./gradlew publishPluginMavenPublicationToOssrhRepository
