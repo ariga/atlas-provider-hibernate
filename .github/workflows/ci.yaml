@@ -4,22 +4,19 @@ on:
     branches:
       - master
   pull_request:
-env:
-  GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE}}
 jobs: 
   gradle:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: Import GPG key
+        run: |
           echo "${{ secrets.GPG_BASE64 }}" | base64 --decode > /tmp/gpg.key
           echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --import --passphrase-fd 0 /tmp/gpg.key
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
-          gpg-private-key: /tmp/gpg.key
-          gpg-passphrase: GPG_PASSPHRASE
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.4.2
