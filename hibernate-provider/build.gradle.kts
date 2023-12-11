@@ -64,7 +64,7 @@ publishing {
                     developer {
                         id = "Ariga"
                         name = "Ariga"
-                        email = "it@ariga.io"
+                        email = "it@atlasgo.io"
                     }
                 }
                 scm {
