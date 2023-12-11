@@ -13,7 +13,12 @@ jobs:
       - name: Release
         if: github.event_name == 'workflow_dispatch'
         run: |
-          echo "DORAV - Running only on workflow_dispatch"
+          cd hibernate-provider
+          ./gradlew publishPluginMavenPublicationToOssrhRepository
+          cd ../gradle-plugin
+          ./gradlew publishPlugins
+          cd ../maven-plugin
+          mvn clean deploy -Dpassphrase=${{ secrets.GPG_PASSPHRASE }}
 
       - uses: actions/setup-java@v3
         with:

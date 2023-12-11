@@ -49,6 +49,9 @@ tasks.jar {
 publishing {
     publications {
         create<MavenPublication>("hibernate-provider") {
+            signing {
+                sign(publishing.publications["hibernate-provider"])
+            }
             pom {
                 name = "hibernate-provider"
                 description = "A Hibernate schema provider for Atlas"
@@ -77,15 +80,15 @@ publishing {
         }
     }
 
-    signing {
-        sign(publishing.publications["hibernate-provider"])
-    }
-
     repositories {
         maven {
             name = "ossrh"
             credentials(PasswordCredentials::class)
-            url = uri("https://s01.oss.sonatype.org/content/groups/staging/")
+            if (version.toString().endsWith("SNAPSHOT")) {
+                url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            } else {
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            }
         }
         maven {
             name = "localPluginRepository"
