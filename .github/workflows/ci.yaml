@@ -120,7 +120,7 @@ jobs:
       - name: Release
         if: github.event_name == 'workflow_dispatch'
         run: |
-          export PROVIDER_VERSION=${{ inputs.provider-version }}
+          export PROVIDER_VERSION=${{ inputs.version }}
           cd hibernate-provider
           ./gradlew publishPluginMavenPublicationToOssrhRepository
           cd ../gradle-plugin
