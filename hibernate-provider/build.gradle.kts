@@ -2,12 +2,13 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `java-library`
+    signing
     id("com.gradle.plugin-publish") version "1.1.0"
     kotlin("jvm") version "1.9.20"
 }
 
 group = "io.atlasgo"
-version = "0.1"
+version = System.getenv("PROVIDER_VERSION")
 
 repositories {
     mavenCentral()
@@ -48,6 +49,9 @@ tasks.jar {
 publishing {
     publications {
         create<MavenPublication>("hibernate-provider") {
+            signing {
+                sign(publishing.publications["hibernate-provider"])
+            }
             pom {
                 name = "hibernate-provider"
                 description = "A Hibernate schema provider for Atlas"
@@ -80,7 +84,11 @@ publishing {
         maven {
             name = "ossrh"
             credentials(PasswordCredentials::class)
-            url = uri("https://s01.oss.sonatype.org/content/groups/staging/")
+            if (version.toString().endsWith("SNAPSHOT")) {
+                url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            } else {
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            }
         }
         maven {
             name = "localPluginRepository"

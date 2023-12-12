@@ -2,7 +2,7 @@ import io.atlasgo.gradle.SchemaTask
 
 plugins {
     kotlin("jvm") version "1.9.21"
-    id("io.atlasgo.hibernate-provider-gradle-plugin") version "0.1"
+    id("io.atlasgo.hibernate-provider-gradle-plugin") version "0.1.1"
 }
 
 group = "org.example"
