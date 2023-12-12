@@ -63,7 +63,7 @@ jobs:
       - name: Build Maven Plugin
         run: |
           cd maven-plugin
-          mvn clean install -Dprovider.version=$PROVIDER_VERSION -Dgpg.passphrase='${{ secrets.gpg_passphrase }}' --batch-mode 
+          mvn clean install -Dgpg.passphrase='${{ secrets.gpg_passphrase }}' --batch-mode 
 
       - name: Integration tests with maven plugin
         run: |
