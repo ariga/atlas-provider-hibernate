@@ -50,9 +50,10 @@ publishing {
     publications {
         create<MavenPublication>("hibernate-provider") {
             signing {
-                sign(publishing.publications["hibernate-provider"])
+                sign(this@create)
             }
             pom {
+                from(components["java"])
                 name = "hibernate-provider"
                 description = "A Hibernate schema provider for Atlas"
                 url = "https://github.com/ariga/atlas-provider-hibernate"

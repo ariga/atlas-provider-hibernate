@@ -122,7 +122,7 @@ jobs:
         run: |
           export PROVIDER_VERSION=${{ inputs.version }}
           cd hibernate-provider
-          ./gradlew publishPluginMavenPublicationToOssrhRepository
+          ./gradlew publishHibernate-providerPublicationToOssrhRepository
           cd ../gradle-plugin
           ./gradlew publishPlugins
           cd ../maven-plugin
