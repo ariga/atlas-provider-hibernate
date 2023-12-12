@@ -21,7 +21,7 @@ java {
 
 dependencies {
     runtimeOnly("com.h2database:h2:2.2.224")
-    implementation("io.atlasgo:hibernate-provider:0.1")
+    implementation("io.atlasgo:hibernate-provider:0.1.1")
     implementation("org.hibernate.orm:hibernate-core:6.3.1.Final")
     implementation("org.springframework.boot:spring-boot-autoconfigure:3.2.0")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.0") {

@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("io.atlasgo.hibernate-provider-gradle-plugin") version "0.1"
+    id("io.atlasgo.hibernate-provider-gradle-plugin") version "0.1.1"
 }
 
 group = "org.example"
