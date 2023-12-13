@@ -50,9 +50,10 @@ publishing {
     publications {
         create<MavenPublication>("hibernate-provider") {
             signing {
-                sign(publishing.publications["hibernate-provider"])
+                sign(this@create)
             }
             pom {
+                from(components["java"])
                 name = "hibernate-provider"
                 description = "A Hibernate schema provider for Atlas"
                 url = "https://github.com/ariga/atlas-provider-hibernate"
@@ -95,6 +96,11 @@ publishing {
             url = uri("../.local-plugin-repository")
         }
     }
+}
+
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    val signingTasks = tasks.withType<Sign>()
+    mustRunAfter(signingTasks)
 }
 
 tasks.test {
