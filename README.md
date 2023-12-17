@@ -17,7 +17,7 @@ See [atlasgo.io](https://atlasgo.io/getting-started#installation) for more insta
 
 ### Gradle
 
-Add the provider to your gradle project:
+Add the provider to your Gradle project:
 ```kotlin
 plugins {
    id("io.atlasgo.hibernate-provider-gradle-plugin") version "0.1"
@@ -34,6 +34,33 @@ Let's check that the task works by running the following command:
 ```shell
 ./gradlew -q schema
 ```
+
+### Maven
+
+To add the provider to your project, you need to add the `hibernate-provider-maven-plugin` plugin to the `pluginManagement` section in your `pom.xml`:
+
+```xml
+ <build>
+     <pluginManagement>
+         <plugins>
+             <plugin>
+                 <groupId>io.atlasgo</groupId>
+                 <artifactId>hibernate-provider-maven-plugin</artifactId>
+                 <version>0.3.8</version>
+             </plugin>
+         </plugins>
+     </pluginManagement>
+ </build>
+```
+A complete example can be seen in the [examples folder](https://github.com/ariga/atlas-provider-hibernate/tree/master/examples/maven_project_example).
+
+The plugin adds a [MOJO](https://stackoverflow.com/questions/8420561/what-is-mojo-in-maven) with a goal named 'schema' to your project.
+
+> You should add the plugin to `pluginManagement` as it is not meant to be running in any specific phase of the build process.
+
+Let's check that the goal is installed correctly by running:
+
+`mvn help:describe -Dplugin=hibernate-provider -Dgoal=schema`
 
 ## Configuration
 
@@ -67,6 +94,19 @@ env "hibernate" {
    }
 }
 ```
+
+For Maven, change the program field to use `mvn` instead of `gradlew`:
+
+```hcl
+data "external_schema" "hibernate" {
+   program = [
+       "mvn",
+       "compile",
+       "-q",
+       "hibernate-provider:schema"
+   ]
+}
+```
   
 ### Choosing the dialect
 
@@ -86,7 +126,7 @@ atlas schema inspect -w --env hibernate --url env://src
 ```
 
 ### Flags
-The schema task supports the following flags:
+Both the Gradle and Maven plugins support the following flags:
 
 * `packages` - List of package names (for example `org.example.myservice.model`). If specified, 
 only classes inside these packages will be considered during the entity scan. Given packages must be part of the classpath
@@ -97,6 +137,10 @@ Used when you need to override the default `ServiceRegistry` initialized by the 
 The properties parameter is the default settings used by the plugin, including ones read from the `properties` parameter.
 * `metadata-builder` - FQDN of a class that implements `java.util.Function.Function<org.hibernate.service.ServiceRegistry, org.hibernate.boot.Metadata>`.
 Used when you need to override the default `Metadata` used by the task. mutually exclusive with `packages` and `classes` arguments.
+* `enable-table-generators` - Atlas does not currently support generated fields that require data initialization such as `GenerationType.SEQUENCE`, `GenerationType.TABLE`, and `Generation.AUTO`.
+By default, the provider will throw an exception if it finds unsupported statements. By enabling this flag,
+the provider will print the unsupported SQL statements.
+  * **Make sure to apply the ignored statements (using `atlas migrate --env hibernate diff --edit`)** See more information on manual migrations [here](/versioned/diff)
 
 You can configure these flags by adding arguments in the `external_schema` block in `atlas.hcl`:
 
@@ -112,10 +156,24 @@ data "external_schema" "hibernate" {
 }
 ```
 
-> Note: The '-q' flag is important, without it, gradle will add additional output
+Or, if you are using Maven:
+```hcl
+data "external_schema" "hibernate" {
+   program = [
+       "mvn",
+       "compile",
+       "-Dproperties", "other.properties"
+       "-Dclasses", "org.example.model.Person"
+       "-q",
+       "hibernate-provider:schema"
+   ]
+}
+```
+
+> Note: The '-q' flag is important, without it, Gradle/Maven will add additional output
 
 ### Gradle tasks
-Alternatively, you can define a new gradle task:
+Alternatively, you can define a new Gradle task:
 ```
 import io.atlasgo.SchemaTask
 
@@ -196,11 +254,7 @@ spring.jpa.properties.jakarta.persistence.database-product-name=MySQL
 spring.jpa.properties.jakarta.persistence.database-major-version=8
 ```
 
-In your `atlas.hcl` file you will need to invoke the Spring application instead of the `schema` gradle task.
-
-## Maven
-
-A maven plugin is coming soon.
+In your `atlas.hcl` file you will need to invoke the Spring application instead of the Gradle/Maven plugin.
 
 ### License
 
