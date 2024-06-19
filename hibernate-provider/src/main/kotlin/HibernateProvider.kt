@@ -114,6 +114,7 @@ class PrintSchemaCommand: CliktCommand() {
             } ?: throw RuntimeException("Unable to load properties file '$properties', is it in the classpath?")
         }
         mapOf(
+            "hibernate.temp.use_jdbc_metadata_defaults" to false, // deprecated from hibernate 6.5
             "hibernate.boot.allow_jdbc_metadata_access" to false,
             AvailableSettings.SCHEMA_MANAGEMENT_TOOL to ConsoleSchemaManagementTool(HibernateSchemaManagementTool(), enableTableGenerator),
             AvailableSettings.CONNECTION_PROVIDER to UserSuppliedConnectionProviderImpl(),
