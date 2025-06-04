@@ -1,11 +1,17 @@
 # atlas-provider-hibernate
 
-Load [Hibernate ORM](https://hibernate.org/orm/) schemas into an [Atlas](https://atlasgo.io) project.
+Use [Atlas](https://atlasgo.io/) with [Hibernate ORM](https://hibernate.org/orm/) to manage your database schema as code. By connecting your Hibernate entity classes to Atlas,
+you can define and edit your schema directly in Java. Atlas will then automatically plan and apply database schema migrations for you, 
+eliminating the need to write migrations manually.
 
-## Use-cases
-1. **Declarative migrations** - use a Terraform-like `atlas schema apply` to apply your Hibernate schema to the database.
-2. **Automatic migration planning** - use `atlas migrate diff` to automatically plan a migration from  
-   the current database version to the schema declared by the code.
+Atlas brings automated CI/CD workflows to your database, along with built-in support for [testing](https://atlasgo.io/testing/schema), [linting](https://atlasgo.io/versioned/lint),
+schema [drift detection](https://atlasgo.io/monitoring/drift-detection), and [schema monitoring](https://atlasgo.io/monitoring). It also allows you to extend Hibernate with 
+advanced database objects such as triggers, row-level security, and custom functions that are not supported natively.
+
+### Use-cases
+1. [**Declarative migrations**](https://atlasgo.io/declarative/apply) - Use the Terraform-like `atlas schema apply --env hibernate` command to apply your Hibernate schema to the database.
+2. [**Automatic migration planning**](https://atlasgo.io/versioned/diff) - Use `atlas migrate diff --env hibernate` to automatically plan database schema changes and generate
+   a migration from the current database version to the desired version defined by your Hibernate schema.
 
 ## Installation
 
