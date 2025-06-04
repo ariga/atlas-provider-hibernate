@@ -1,6 +1,6 @@
 # atlas-provider-hibernate
 
-Use [Atlas](https://atlasgo.io/) with [Hibernate ORM](https://hibernate.org/orm/) to manage your database schema as code. By connecting your Hibernate models to Atlas,
+Use [Atlas](https://atlasgo.io/) with [Hibernate ORM](https://hibernate.org/orm/) to manage your database schema as code. By connecting your Hibernate entity classes to Atlas,
 you can define and edit your schema directly in Java. Atlas will then automatically plan and apply database schema migrations for you, 
 eliminating the need to write migrations manually.
 
