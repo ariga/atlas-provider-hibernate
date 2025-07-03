@@ -1,4 +1,4 @@
-package io.other.other_package
+package models.otherpackage
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

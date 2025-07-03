@@ -58,6 +58,16 @@ internal class ExportSchemaMojo : AbstractMojo() {
         if (enableTableGenerators) {
             args += "--enable-table-generators"
         }
+        val allSourceFiles = getAllSourceFiles()
+        if (allSourceFiles.isNotEmpty()) {
+            val sourceListFile = File(project.build.directory, "tmp/atlas-source-list.txt")
+            sourceListFile.parentFile.mkdirs()
+            val projectDir = project.basedir
+            sourceListFile.writeText(allSourceFiles.joinToString(System.lineSeparator()) { 
+                projectDir.toPath().relativize(it.toPath()).toString()
+            })
+            args += listOf("--sources-list-file", sourceListFile.absolutePath)
+        }
         if (metadataBuilderClass.isEmpty()) {
             if (classes.isNotEmpty()) {
                 args += listOf("--classes", classes.joinToString(","))
@@ -125,6 +135,13 @@ internal class ExportSchemaMojo : AbstractMojo() {
             it.file.toPath()
         }
         return path.joinToString(":")
+    }
+
+    private fun getAllSourceFiles(): List<File> {
+        return project.basedir.walkTopDown()
+            .filter { file -> file.isFile }
+            .filter { file -> file.name.endsWith(".java") || file.name.endsWith(".kt") }
+            .toList()
     }
 }
 

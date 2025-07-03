@@ -1,6 +1,7 @@
 package io.atlasgo
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -18,6 +19,7 @@ import org.hibernate.cfg.AvailableSettings
 import org.hibernate.engine.jdbc.connections.internal.UserSuppliedConnectionProviderImpl
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.id.IdentifierGenerator
+import org.hibernate.mapping.Table
 import org.hibernate.service.ServiceRegistry
 import org.hibernate.service.spi.ServiceRegistryAwareService
 import org.hibernate.service.spi.ServiceRegistryImplementor
@@ -27,6 +29,7 @@ import org.hibernate.tool.schema.internal.exec.GenerationTarget
 import org.hibernate.tool.schema.spi.SchemaManagementTool
 import org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator
 import org.hibernate.type.Type
+import java.io.File
 import java.io.OutputStream
 import java.net.URI
 import java.net.URL
@@ -35,6 +38,7 @@ import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.function.Function
 import java.util.logging.Level
 import java.util.logging.Logger
+import kotlin.let
 import kotlin.system.exitProcess
 
 private const val linkToGuide = "https://atlasgo.io/guides/orms/hibernate"
@@ -98,6 +102,9 @@ class PrintSchemaCommand: CliktCommand() {
     private val enableTableGenerator by option("--enable-table-generators", help = "Enables some GenerationType (primarily SEQUENCE and TABLE) which are disabled by default")
         .flag("--disable-table-generators")
 
+    private val sourcesListFile by option("--sources-list-file", help = "File containing a list of source files to process, one per line")
+        .convert { File(it) }
+
     var exitOnUnsupportedGenerationType = true
 
     override fun run() {
@@ -131,7 +138,7 @@ class PrintSchemaCommand: CliktCommand() {
                 .build()
         }
         try {
-            val metadata = metadataBuilderClass.takeIf { it.isNotBlank() }?.let {
+            val metadata: Metadata = metadataBuilderClass.takeIf { it.isNotBlank() }?.let {
                 val loader = registry.getService(ClassLoaderService::class.java)
                     ?: throw Exception("Missing ClassLoaderService in registry")
                 loader.classForName<Function<ServiceRegistry, Metadata>>(it)
@@ -158,6 +165,11 @@ class PrintSchemaCommand: CliktCommand() {
                 AvailableSettings.JAKARTA_HBM2DDL_SCRIPTS_ACTION to Action.NONE,
                 AvailableSettings.JAKARTA_HBM2DDL_CREATE_SCHEMAS to true
             )
+            sourcesListFile?.let { sourcesListFile ->
+                val sourceMaps = extractSourceMappings(sourcesListFile, metadata)
+                println(sourceMaps.joinToString("\n"))
+            }
+
             SchemaManagementToolCoordinator.process(
                 metadata,
                 registry,
