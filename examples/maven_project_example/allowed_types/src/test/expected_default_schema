@@ -1,4 +1,6 @@
 create table Department (id bigint not null auto_increment, name varchar(255), primary key (id)) engine=InnoDB;
 create table Employee (id bigint not null auto_increment, name varchar(255), department_id bigint, primary key (id)) engine=InnoDB;
 create table Location (id bigint not null auto_increment, title varchar(255), primary key (id)) engine=InnoDB;
+create table project (id bigint not null auto_increment, description varchar(255), name varchar(255) not null, department_id bigint, primary key (id)) engine=InnoDB;
 alter table Employee add constraint FK14tijxqry9ml17nk86sqfp561 foreign key (department_id) references Department (id);
+alter table project add constraint FKlwqvcorghndns8byxet3u2x87 foreign key (department_id) references Department (id);
