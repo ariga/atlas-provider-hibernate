@@ -43,7 +43,7 @@ jobs:
 
       - name: Integration tests with local plugin repo
         run: |
-          PROVIDER_VERSION=0.1.1 ./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
+          PROVIDER_VERSION=0.0.0-SNAPSHOT ./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
           cd examples/with_local_plugin_repository
           ./gradlew -q schema | tee schema_output
           diff schema_output src/test/expected_default_schema
