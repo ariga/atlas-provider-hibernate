@@ -11,7 +11,6 @@ echo "🔨 Publishing hibernate-provider library..."
 # Set version if not provided
 if [ -z "$PROVIDER_VERSION" ]; then
     export PROVIDER_VERSION="0.0.0-SNAPSHOT"
-    echo "📝 Using default version: $PROVIDER_VERSION"
 fi
 
 echo "📝 Using version: $PROVIDER_VERSION"
