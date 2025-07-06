@@ -45,7 +45,7 @@ tasks.jar {
     archiveBaseName.set(rootProject.name)
 }
 
-val publishToProduction = project.hasProperty("publishToProduction")
+val publishToProduction = project.hasProperty("production")
 
 publishing {
     publications {
@@ -109,7 +109,7 @@ tasks.test {
 
 signing {
     isRequired = publishToProduction
-    if (isRequired) {
+    if (publishToProduction) {
         sign(publishing.publications)
     }
 }
