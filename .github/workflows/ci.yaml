@@ -117,6 +117,12 @@ jobs:
           output=$(atlas migrate diff --env hibernate)
           [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
 
+      - name: Test Atlas schema linting
+        run: |
+          cd examples/maven_project_example/allowed_types
+          atlas schema lint --env hibernate | tee lint_output
+          diff lint_output src/test/expected_lint_output
+
       - name: Release
         if: github.event_name == 'workflow_dispatch'
         run: |

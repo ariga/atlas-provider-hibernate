@@ -168,6 +168,7 @@ class PrintSchemaCommand: CliktCommand() {
             sourcesListFile?.let { sourcesListFile ->
                 val sourceMaps = extractSourceMappings(sourcesListFile, metadata)
                 println(sourceMaps.joinToString("\n"))
+                println()
             }
 
             SchemaManagementToolCoordinator.process(

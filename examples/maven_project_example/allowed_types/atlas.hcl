@@ -28,6 +28,11 @@ env "hibernate" {
          diff = "{{ sql . \"  \" }}"
       }
    }
+   lint {
+      rule "hcl" "custom-rules" {
+         src = ["schema.rule.hcl"]
+      }
+   }
 }
 
 env "hibernate_postgresql" {

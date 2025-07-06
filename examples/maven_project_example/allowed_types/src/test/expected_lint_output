@@ -1,0 +1,12 @@
+Analyzing schema objects (24 objects in total):
+
+  no-null-without-default rule violated:
+    -- Department.java:16: Column id is NOT NULL but has no default value
+    -- Employee.java:6: Column id is NOT NULL but has no default value
+    -- Location.java:9: Column id is NOT NULL but has no default value
+    -- Project.kt:7: Column id is NOT NULL but has no default value
+    -- Project.kt:7: Column name is NOT NULL but has no default value
+
+  -------------------------
+  -- 449.625µs
+  -- 5 diagnostics
