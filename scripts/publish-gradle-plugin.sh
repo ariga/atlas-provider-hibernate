@@ -11,9 +11,8 @@ echo "🔨 Publishing gradle-plugin..."
 # Set version if not provided
 if [ -z "$PROVIDER_VERSION" ]; then
     export PROVIDER_VERSION="0.0.0-SNAPSHOT"
-    echo "📝 Using default version: $PROVIDER_VERSION"
 fi
-echo "📝 Using version: $PROVIDER_VERSION"
 
+echo "📝 Using version: $PROVIDER_VERSION"
 cd "$SCRIPT_DIR/../gradle-plugin"
-./gradlew clean build publishAllPublicationsToLocalPluginRepositoryRepository -x test
+./gradlew clean build publishAllPublicationsToLocalPluginRepositoryRepository
