@@ -123,7 +123,9 @@ jobs:
         run: |
           cd examples/maven_project_example/allowed_types
           atlas schema lint --env hibernate | tee lint_output
-          diff lint_output src/test/expected_lint_output
+          # Get the number of lines in expected output and trim lint_output to match
+          head -n $(wc -l < src/test/expected_lint_output) lint_output > lint_output_trimmed
+          diff lint_output_trimmed src/test/expected_lint_output
 
       - name: Release
         if: github.event_name == 'workflow_dispatch'

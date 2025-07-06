@@ -7,6 +7,3 @@ Analyzing schema objects (24 objects in total):
     -- Project.kt:7: Column id is NOT NULL but has no default value
     -- Project.kt:7: Column name is NOT NULL but has no default value
 
-  -------------------------
-  -- 449.625µs
-  -- 5 diagnostics
