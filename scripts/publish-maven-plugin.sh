@@ -15,5 +15,6 @@ if [ -z "$PROVIDER_VERSION" ]; then
     echo "📝 Using default version: $PROVIDER_VERSION"
 fi
 
+echo "✅ Using version: $PROVIDER_VERSION"
 cd "$SCRIPT_DIR/../maven-plugin"
 mvn clean deploy -Plocal -Dprovider.version=$PROVIDER_VERSION
