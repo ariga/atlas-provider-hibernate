@@ -1,2 +1,3 @@
 -- atlas:pos Event src/main/java/org/example/minimodel/Event.java:10
+
 create table Event (id bigint not null auto_increment, title varchar(255), primary key (id)) engine=InnoDB;
