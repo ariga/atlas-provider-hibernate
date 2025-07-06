@@ -1,3 +1,6 @@
+-- atlas:pos Event src/main/java/org/example/minimodel/Event.java:10
+-- atlas:pos Event2 src/main/java/io/matilda/model/Event2.java:10
+-- atlas:pos Location src/main/java/org/example/minimodel/Location.java:10
 create table Event (id bigint not null auto_increment, title varchar(255), primary key (id)) engine=InnoDB;
 create table Event2 (id bigint not null auto_increment, title varchar(255), primary key (id)) engine=InnoDB;
 create table Location (id bigint not null auto_increment, primary key (id)) engine=InnoDB;

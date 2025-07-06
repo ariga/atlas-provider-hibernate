@@ -1,1 +1,2 @@
+-- atlas:pos Location src/main/java/com/example/minimodel/Location.java:9
 create table Location (id bigint not null auto_increment, title varchar(255), primary key (id)) engine=InnoDB;

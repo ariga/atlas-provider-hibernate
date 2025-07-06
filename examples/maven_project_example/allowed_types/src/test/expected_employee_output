@@ -1,3 +1,6 @@
+-- atlas:pos Department src/main/java/com/example/model/Department.java:16
+-- atlas:pos Employee src/main/java/com/example/model/Employee.java:6
+-- atlas:pos project src/main/kotlin/com/example/model/Project.kt:7
 create table Department (id bigint not null auto_increment, name varchar(255), primary key (id)) engine=InnoDB;
 create table Employee (id bigint not null auto_increment, name varchar(255), department_id bigint, primary key (id)) engine=InnoDB;
 create table project (id bigint not null auto_increment, description varchar(255), name varchar(255) not null, department_id bigint, primary key (id)) engine=InnoDB;
