@@ -2,8 +2,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `java-library`
+    `maven-publish`
     signing
-    id("com.gradle.plugin-publish") version "1.1.0"
     kotlin("jvm") version "1.9.20"
 }
 
@@ -45,15 +45,13 @@ tasks.jar {
     archiveBaseName.set(rootProject.name)
 }
 
+val publishToProduction = project.hasProperty("production")
 
 publishing {
     publications {
         create<MavenPublication>("hibernate-provider") {
-            signing {
-                sign(this@create)
-            }
+            from(components["java"])
             pom {
-                from(components["java"])
                 name = "hibernate-provider"
                 description = "A Hibernate schema provider for Atlas"
                 url = "https://github.com/ariga/atlas-provider-hibernate"
@@ -82,13 +80,15 @@ publishing {
     }
 
     repositories {
-        maven {
-            name = "ossrh"
-            credentials(PasswordCredentials::class)
-            if (version.toString().endsWith("SNAPSHOT")) {
-                url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            } else {
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+        if (publishToProduction) {
+            maven {
+                name = "ossrh"
+                credentials(PasswordCredentials::class)
+                if (version.toString().endsWith("SNAPSHOT")) {
+                    url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                } else {
+                    url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                }
             }
         }
         maven {
@@ -105,4 +105,11 @@ tasks.withType<AbstractPublishToMaven>().configureEach {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+signing {
+    isRequired = publishToProduction
+    if (publishToProduction) {
+        sign(publishing.publications)
+    }
 }
