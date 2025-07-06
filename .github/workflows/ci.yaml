@@ -122,9 +122,9 @@ jobs:
         run: |
           export PROVIDER_VERSION=${{ inputs.version }}
           cd hibernate-provider
-          ./gradlew publishHibernate-providerPublicationToOssrhRepository
+          ./gradlew publishHibernate-providerPublicationToOssrhRepository -P publishToProduction=true
           cd ../gradle-plugin
-          ./gradlew publishPlugins
+          ./gradlew publishPlugins -P publishToProduction=true
           cd ../maven-plugin
           mvn clean deploy --batch-mode -Dprovider.version=$PROVIDER_VERSION -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} -s settings.xml
 
