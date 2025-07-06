@@ -63,7 +63,7 @@ jobs:
       - name: Build Maven Plugin
         run: |
           cd maven-plugin
-          mvn clean install -Dgpg.passphrase='${{ secrets.gpg_passphrase }}' --batch-mode 
+          mvn clean install -Plocal --batch-mode
 
       - name: Integration tests with maven plugin
         run: |
@@ -126,7 +126,7 @@ jobs:
           cd ../gradle-plugin
           ./gradlew publishPlugins -P publishToProduction=true
           cd ../maven-plugin
-          mvn clean deploy --batch-mode -Dprovider.version=$PROVIDER_VERSION -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} -s settings.xml
+          mvn clean deploy -Pproduction --batch-mode -Dprovider.version=$PROVIDER_VERSION -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} -s settings.xml
 
       - name: Cleanup
         if: always()

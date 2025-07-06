@@ -14,10 +14,48 @@
     <properties>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
-        <provider.version>0.0-SNAPSHOT</provider.version>
+        <provider.version>0.0.0-SNAPSHOT</provider.version>
     </properties>
 
     <version>${provider.version}</version>
+
+    <profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <skipSigning>true</skipSigning>
+            </properties>
+            <distributionManagement>
+                <repository>
+                    <id>local-plugin-repository</id>
+                    <url>file://${project.basedir}/../.local-plugin-repository</url>
+                </repository>
+                <snapshotRepository>
+                    <id>local-plugin-repository</id>
+                    <url>file://${project.basedir}/../.local-plugin-repository</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>production</id>
+            <properties>
+                <skipSigning>false</skipSigning>
+            </properties>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
     <licenses>
         <license>
@@ -78,17 +116,6 @@
             <version>4.2.1</version>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <build>
         <plugins>
@@ -155,6 +182,7 @@
                                 <arg>--pinentry-mode</arg>
                                 <arg>loopback</arg>
                             </gpgArguments>
+                            <skip>${skipSigning}</skip>
                         </configuration>
                     </execution>
                 </executions>
