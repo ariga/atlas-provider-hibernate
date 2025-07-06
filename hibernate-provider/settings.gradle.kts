@@ -3,5 +3,3 @@ plugins {
 }
 
 rootProject.name = "hibernate-provider"
-include("gradle-plugin")
-include("hibernate-provider")

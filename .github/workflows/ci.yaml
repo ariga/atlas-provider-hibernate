@@ -40,12 +40,11 @@ jobs:
         with:
           cloud-token: ${{ secrets.ATLAS_TOKEN }}
 
-      - name: Build and test Plugin
-        run: ./gradlew build
+      - name: Build and test library & plugins
+        run: PROVIDER_VERSION=0.0.0-SNAPSHOT make publish-locally
 
-      - name: Integration tests with local plugin repo
+      - name: Integration tests with gradle plugin
         run: |
-          PROVIDER_VERSION=0.0.0-SNAPSHOT ./gradlew publishAllPublicationsToLocalPluginRepositoryRepository
           cd examples/with_local_plugin_repository
           ./gradlew -q schema | tee schema_output
           diff schema_output src/test/expected_default_schema

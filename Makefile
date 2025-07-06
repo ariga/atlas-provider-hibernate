@@ -28,27 +28,34 @@ help:
 	@echo "  PROVIDER_VERSION=1.0.0 make publish-all"
 
 # Publish library only
-publish-library:
+publish-library-locally:
 	@echo "$(GREEN)Publishing hibernate-provider library with version: $(PROVIDER_VERSION)$(NC)"
-	@PROVIDER_VERSION=$(PROVIDER_VERSION) ./scripts/publish-library.sh
+	@PROVIDER_VERSION=$(PROVIDER_VERSION) ./scripts/publish-library-locally.sh
 
 # Publish gradle plugin only (depends on library)
-publish-gradle: publish-library
+publish-gradle-locally: publish-library-locally
 	@echo "$(GREEN)Publishing gradle-plugin with version: $(PROVIDER_VERSION)$(NC)"
-	@PROVIDER_VERSION=$(PROVIDER_VERSION) ./scripts/publish-gradle-plugin.sh
+	@PROVIDER_VERSION=$(PROVIDER_VERSION) ./scripts/publish-gradle-plugin-locally.sh
 	@echo "🧪 To test the plugin:"
 	@echo "  Gradle: cd examples/with_local_plugin_repository && ./gradlew schema"
 
 # Publish maven plugin only
-publish-maven:
+publish-maven-locally: publish-library-locally
 	@echo "$(GREEN)Publishing maven-plugin with version: $(PROVIDER_VERSION)$(NC)"
-	@PROVIDER_VERSION=$(PROVIDER_VERSION) ./scripts/publish-maven-plugin.sh
+	@PROVIDER_VERSION=$(PROVIDER_VERSION) ./scripts/publish-maven-plugin-locally.sh
 	@echo "🧪 To test the plugin:"
 	@echo "  Maven: cd examples/maven_project_example/allowed_types && mvn -q compile hibernate-provider:schema"
 
 # Publish all components (depends on all individual targets)
-publish-all: publish-library publish-gradle publish-maven
+publish-locally: publish-library-locally publish-gradle-locally publish-maven-locally
 	@echo "$(GREEN)✅ All components published to local repository!$(NC)"
+
+build:
+	@echo "$(YELLOW)Building all components...$(NC)"
+	@cd hibernate-provider && ./gradlew build
+	@cd gradle-plugin && ./gradlew build
+	@cd maven-plugin && mvn clean install
+	@echo "$(GREEN)All components built successfully!$(NC)"
 
 # Clean all build artifacts and local repository
 clean:

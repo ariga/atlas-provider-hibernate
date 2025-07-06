@@ -14,6 +14,10 @@ version = System.getenv("PROVIDER_VERSION")
 
 repositories {
     mavenCentral()
+    maven {
+        name = "localPluginRepository"
+        url = uri("../.local-plugin-repository")
+    }
 }
 
 java {
@@ -63,7 +67,7 @@ dependencies {
     compileOnly("org.hibernate.orm:hibernate-core:6.1.7.Final")
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     implementation(gradleApi())
-    implementation(project(":hibernate-provider"))
+    implementation("io.atlasgo:hibernate-provider:${System.getenv("PROVIDER_VERSION") ?: "0.0.0-SNAPSHOT"}")
     runtimeOnly(kotlin("stdlib"))
 }
 
