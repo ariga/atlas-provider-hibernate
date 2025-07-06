@@ -14,6 +14,7 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
+import java.io.File
 
 abstract class SchemaTask : JavaExec() {
     @Input
@@ -92,8 +93,25 @@ abstract class SchemaTask : JavaExec() {
         if (enableTableGenerators) {
             args += "--enable-table-generators"
         }
+        val allSourceFiles = getAllSourceFiles().map {
+            project.projectDir.toPath().relativize(it.toPath()).toString()
+        }
+        val sourceListFile = project.layout.buildDirectory.file("tmp/atlas-source-list.txt").get().asFile
+        sourceListFile.parentFile.mkdirs()
+        sourceListFile.writeText(allSourceFiles.joinToString(System.lineSeparator()))
+        args += listOf("--sources-list-file", sourceListFile.absolutePath)
         this.args = args
         super.exec()
+    }
+
+    private fun getAllSourceFiles(): List<File> {
+        val sourceFiles = mutableListOf<File>()
+        project.javaPlugin?.sourceSets?.forEach { sourceSet ->
+            sourceSet.allSource.filter { it.exists() }.forEach {
+                sourceFiles.add(it)
+            }
+        }
+        return sourceFiles
     }
 }
 
@@ -111,7 +129,6 @@ class HibernateProvider : Plugin<Project> {
         fun main(args: Array<String>) = PrintSchemaCommand().main(args)
     }
 }
-
 
 private val JavaPluginExtension.mainSourceSet: SourceSet?
     get() = sourceSets.named(MAIN_SOURCE_SET_NAME).get()
