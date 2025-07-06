@@ -36,18 +36,16 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveBaseName = "hibernate-provider-gradle-plugin"
 }
 
-if (project.hasProperty("production")) {
-    gradlePlugin {
-        plugins {
-            create("io.atlasgo.hibernate-provider-gradle-plugin") {
-                website = "https://github.com/ariga/atlas-provider-hibernate"
-                vcsUrl = "https://github.com/ariga/atlas-provider-hibernate.git"
-                description = "Atlas plugin, used as a database schema provider to Atlas."
-                displayName = "Atlas Hibernate Provider"
-                tags = listOf("database", "hibernate", "atlas", "migrations", "schema")
-                id = "io.atlasgo.hibernate-provider-gradle-plugin"
-                implementationClass = "io.atlasgo.gradle.HibernateProvider"
-            }
+gradlePlugin {
+    plugins {
+        create("io.atlasgo.hibernate-provider-gradle-plugin") {
+            website = "https://github.com/ariga/atlas-provider-hibernate"
+            vcsUrl = "https://github.com/ariga/atlas-provider-hibernate.git"
+            description = "Atlas plugin, used as a database schema provider to Atlas."
+            displayName = "Atlas Hibernate Provider"
+            tags = listOf("database", "hibernate", "atlas", "migrations", "schema")
+            id = "io.atlasgo.hibernate-provider-gradle-plugin"
+            implementationClass = "io.atlasgo.gradle.HibernateProvider"
         }
     }
 }
