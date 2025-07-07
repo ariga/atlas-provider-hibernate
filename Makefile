@@ -52,7 +52,7 @@ publish-locally: publish-library-locally publish-gradle-locally publish-maven-lo
 
 build:
 	@echo "$(YELLOW)Building all components...$(NC)"
-	@cd hibernate-provider && mvn clean compile test
+	@cd hibernate-provider && mvn clean package
 	@cd gradle-plugin && ./gradlew build
 	@cd maven-plugin && mvn clean install
 	@echo "$(GREEN)All components built successfully!$(NC)"
