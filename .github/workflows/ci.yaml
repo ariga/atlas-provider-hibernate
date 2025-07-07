@@ -24,6 +24,8 @@ jobs:
 
       - name: Import GPG key
         run: |
+          mkdir -p ~/.gradle
+          mkdir -p ~/.m2
           echo "${{ secrets.GPG_BASE64 }}" | base64 --decode > /tmp/gpg.key
           echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --import --passphrase-fd 0 /tmp/gpg.key
           echo "signing.keyId=BB19097D" >> ~/.gradle/gradle.properties
