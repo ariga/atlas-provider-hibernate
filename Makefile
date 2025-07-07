@@ -52,7 +52,7 @@ publish-locally: publish-library-locally publish-gradle-locally publish-maven-lo
 
 build:
 	@echo "$(YELLOW)Building all components...$(NC)"
-	@cd hibernate-provider && ./gradlew build
+	@cd hibernate-provider && mvn clean compile test
 	@cd gradle-plugin && ./gradlew build
 	@cd maven-plugin && mvn clean install
 	@echo "$(GREEN)All components built successfully!$(NC)"
@@ -61,7 +61,7 @@ build:
 clean:
 	@echo "$(YELLOW)Cleaning build artifacts...$(NC)"
 	@rm -rf .local-plugin-repository
-	@cd hibernate-provider && ./gradlew clean
+	@cd hibernate-provider && mvn clean
 	@cd gradle-plugin && ./gradlew clean
 	@cd maven-plugin && mvn clean
 	@echo "$(GREEN)All build artifacts cleaned!$(NC)"

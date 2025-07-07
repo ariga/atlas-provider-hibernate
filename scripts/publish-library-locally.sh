@@ -15,4 +15,4 @@ fi
 
 echo "📝 Using version: $PROVIDER_VERSION"
 cd "$SCRIPT_DIR/../hibernate-provider" 
-./gradlew clean build publishAllPublicationsToLocalPluginRepositoryRepository
+mvn clean deploy --batch-mode -Plocal -Drevision=$PROVIDER_VERSION

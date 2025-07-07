@@ -2,3 +2,4 @@
 target
 build
 bin
+.flattened-pom.xml

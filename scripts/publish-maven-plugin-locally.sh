@@ -16,4 +16,4 @@ fi
 
 echo "📝 Using version: $PROVIDER_VERSION"
 cd "$SCRIPT_DIR/../maven-plugin"
-mvn clean compile deploy -Plocal -Dprovider.version="$PROVIDER_VERSION"
+mvn clean deploy --batch-mode -Plocal -Dprovider.version="$PROVIDER_VERSION"

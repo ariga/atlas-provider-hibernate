@@ -25,9 +25,6 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <properties>
-                <skipSigning>true</skipSigning>
-            </properties>
             <distributionManagement>
                 <repository>
                     <id>local-plugin-repository</id>
@@ -41,19 +38,46 @@
         </profile>
         <profile>
             <id>production</id>
-            <properties>
-                <skipSigning>false</skipSigning>
-            </properties>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>ossrh</id>
-                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-                <repository>
-                    <id>ossrh</id>
-                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
+            <activation>
+                <property>
+                    <name>production</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.8.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                  <keyname>${gpg.keyname}</keyname>
+                                  <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                  <gpgArguments>
+                                      <arg>--pinentry-mode</arg>
+                                      <arg>loopback</arg>
+                                  </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
@@ -152,50 +176,22 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>1.9.20</version>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>javadocJar</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                        <configuration>
-                            <keyname>${gpg.keyname}</keyname>
-                            <passphraseServerId>${gpg.keyname}</passphraseServerId>
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
-                            <skip>${skipSigning}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
-                <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <sourceDirectories>
+                        <dir>src/main/kotlin</dir>
+                        <dir>../hibernate-provider/src/main/kotlin</dir>
+                    </sourceDirectories>
                 </configuration>
             </plugin>
             <plugin>
@@ -208,6 +204,27 @@
                         <id>compile</id>
                         <goals>
                             <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.7.1</version>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
                         </goals>
                     </execution>
                 </executions>
