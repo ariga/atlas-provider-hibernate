@@ -4,13 +4,14 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     `java-library`
     `java-gradle-plugin`
+    signing
     id("com.gradle.plugin-publish") version "1.1.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     kotlin("jvm")
 }
 
 group = "io.atlasgo"
-version = System.getenv("PROVIDER_VERSION")
+version = System.getenv("PROVIDER_VERSION") ?: "0.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -40,6 +41,8 @@ tasks.named<ShadowJar>("shadowJar") {
     archiveBaseName = "hibernate-provider-gradle-plugin"
 }
 
+val publishToProduction = project.hasProperty("production")
+
 gradlePlugin {
     plugins {
         create("io.atlasgo.hibernate-provider-gradle-plugin") {
@@ -67,10 +70,22 @@ dependencies {
     compileOnly("org.hibernate.orm:hibernate-core:6.1.7.Final")
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     implementation(gradleApi())
-    implementation("io.atlasgo:hibernate-provider:${System.getenv("PROVIDER_VERSION") ?: "0.0.0-SNAPSHOT"}")
+    implementation("io.atlasgo:hibernate-provider:$version")
     runtimeOnly(kotlin("stdlib"))
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType<AbstractPublishToMaven>().configureEach {
+    val signingTasks = tasks.withType<Sign>()
+    mustRunAfter(signingTasks)
+}
+
+signing {
+    isRequired = publishToProduction
+    if (publishToProduction) {
+        sign(publishing.publications)
+    }
 }
