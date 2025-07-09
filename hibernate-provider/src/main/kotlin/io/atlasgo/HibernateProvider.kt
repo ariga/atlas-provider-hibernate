@@ -19,7 +19,6 @@ import org.hibernate.cfg.AvailableSettings
 import org.hibernate.engine.jdbc.connections.internal.UserSuppliedConnectionProviderImpl
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.id.IdentifierGenerator
-import org.hibernate.mapping.Table
 import org.hibernate.service.ServiceRegistry
 import org.hibernate.service.spi.ServiceRegistryAwareService
 import org.hibernate.service.spi.ServiceRegistryImplementor

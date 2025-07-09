@@ -13,6 +13,11 @@ env "hibernate" {
   migration {
     dir = "file://migrations"
   }
+  lint {
+    rule "hcl" "custom-rules" {
+      src = ["schema.rule.hcl"]
+    }
+  }
 }
 
 env "hibernate_postgresql" {

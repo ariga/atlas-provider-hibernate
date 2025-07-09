@@ -62,9 +62,8 @@ internal class ExportSchemaMojo : AbstractMojo() {
         if (allSourceFiles.isNotEmpty()) {
             val sourceListFile = File(project.build.directory, "tmp/atlas-source-list.txt")
             sourceListFile.parentFile.mkdirs()
-            val projectDir = project.basedir
-            sourceListFile.writeText(allSourceFiles.joinToString(System.lineSeparator()) { 
-                projectDir.toPath().relativize(it.toPath()).toString()
+            sourceListFile.writeText(allSourceFiles.joinToString(System.lineSeparator()) {
+                it.absolutePath.toString()
             })
             args += listOf("--sources-list-file", sourceListFile.absolutePath)
         }
