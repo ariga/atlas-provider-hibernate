@@ -56,8 +56,12 @@ val integrationTest = tasks.register("integrationTests") {
             schemaTask.standardOutputCapture.start()
             schemaTask.exec()
             schemaTask.standardOutputCapture.stop()
+            
+            // Normalize the output by converting absolute paths to relative paths
+            val normalizedOutput = normalizePathsInOutput(output)
+            
             val expectedOutput = File("src/test/$testFile").readText()
-            if (output != expectedOutput) {
+            if (normalizedOutput != expectedOutput) {
                 println("""
                     output for task ${schemaTask.name} was not as expected (file: $testFile):
                     ----
@@ -65,12 +69,17 @@ val integrationTest = tasks.register("integrationTests") {
                     ----
                     actual output:
                     ----
-                    $output
+                    $normalizedOutput
                     ----
                 """.trimIndent())
                 throw RuntimeException("Unexpected output for task ${schemaTask.name}")
             }
         }
     }
+}
+
+fun normalizePathsInOutput(output: String): String {
+    val projectDir = project.projectDir.absolutePath
+    return output.replace(projectDir + File.separator, "")
 }
 

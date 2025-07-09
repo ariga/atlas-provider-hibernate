@@ -94,7 +94,7 @@ abstract class SchemaTask : JavaExec() {
             args += "--enable-table-generators"
         }
         val allSourceFiles = getAllSourceFiles().map {
-            project.projectDir.toPath().relativize(it.toPath()).toString()
+            it.absolutePath
         }
         val sourceListFile = project.layout.buildDirectory.file("tmp/atlas-source-list.txt").get().asFile
         sourceListFile.parentFile.mkdirs()

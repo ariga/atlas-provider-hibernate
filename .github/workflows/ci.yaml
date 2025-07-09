@@ -43,13 +43,6 @@ jobs:
       - name: Build and test library & plugins
         run: PROVIDER_VERSION=0.0.0-SNAPSHOT make publish-locally
 
-      - name: Integration tests with gradle plugin
-        run: |
-          cd examples/with_local_plugin_repository
-          ./gradlew -q schema | tee schema_output
-          diff schema_output src/test/expected_default_schema
-          ./gradlew integrationTests
-
       - name: Integration tests with unsupported schema
         run: |
           cd examples/with_forbidden_generation_type
@@ -61,35 +54,49 @@ jobs:
               echo "error string found"
           fi
 
-      - name: Build Maven Plugin
+      - name: Integration tests
         run: |
-          cd maven-plugin
-          mvn clean install -Plocal --batch-mode
-
-      - name: Integration tests with maven plugin
-        run: |
-          cd examples/maven_project_example
+          set -x
+          # Function to normalize paths and diff with expected output
+          normalize_and_diff() {
+            local output_file="$1"
+            local expected_file="$2"
+            sed "s|$(pwd)/||g" "$output_file" > "${output_file}_normalized"
+            diff "${output_file}_normalized" "$expected_file"
+          }
+          
+          cd examples/with_local_plugin_repository
+          ./gradlew -q schema | tee schema_output
+          normalize_and_diff schema_output src/test/expected_default_schema
+          ./gradlew integrationTests
+          
+          cd ../maven_project_example
           mvn compile --batch-mode
 
           cd allowed_types
-          set -x
           mvn -q hibernate-provider:schema | tee maven_schema_output 
-          diff maven_schema_output src/test/expected_default_schema
+          normalize_and_diff maven_schema_output src/test/expected_default_schema
 
           mvn -q hibernate-provider:schema@schema-using-postgresql-properties | tee maven_psql_output
-          diff maven_psql_output src/test/expected_postgresql_output
+          normalize_and_diff maven_psql_output src/test/expected_postgresql_output
 
           mvn -q hibernate-provider:schema -Dregistry-builder=com.example.H2ServiceRegistryBuilder | tee maven_h2_output
-          diff maven_h2_output src/test/expected_h2_output
+          normalize_and_diff maven_h2_output src/test/expected_h2_output
 
           mvn -q hibernate-provider:schema -Dmetadata-builder=com.example.MetadataBuilder | tee maven_mini_output
-          diff maven_mini_output src/test/expected_mini_output
+          normalize_and_diff maven_mini_output src/test/expected_mini_output
 
           mvn -q hibernate-provider:schema -Dpackages="com.example.model" | tee maven_employee_output
-          diff maven_employee_output src/test/expected_employee_output
+          normalize_and_diff maven_employee_output src/test/expected_employee_output
 
           mvn -q hibernate-provider:schema -Dpackages="com.example.model" -Dclasses="com.example.minimodel.Location" | tee maven_classes_and_packages_output
-          diff maven_classes_and_packages_output src/test/expected_default_schema
+          normalize_and_diff maven_classes_and_packages_output src/test/expected_default_schema
+
+          atlas schema lint --env hibernate | tee lint_output
+          # Trim to match expected output length, then normalize and diff
+          head -n $(wc -l < src/test/expected_lint_output) lint_output > lint_output_trimmed
+          normalize_and_diff lint_output_trimmed src/test/expected_lint_output
+
 
           cd ../forbidden_types
           if (set -o pipefail && atlas schema inspect --env hibernate --url env://src 2>&1 | tee /tmp/forbidden_output); then
@@ -117,14 +124,6 @@ jobs:
           cd examples/maven_project_example/allowed_types
           output=$(atlas migrate diff --env hibernate)
           [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
-
-      - name: Test Atlas schema linting
-        run: |
-          cd examples/maven_project_example/allowed_types
-          atlas schema lint --env hibernate | tee lint_output
-          # Get the number of lines in expected output and trim lint_output to match
-          head -n $(wc -l < src/test/expected_lint_output) lint_output > lint_output_trimmed
-          diff lint_output_trimmed src/test/expected_lint_output
 
       - name: Release
         if: github.event_name == 'workflow_dispatch'
