@@ -24,12 +24,11 @@ import org.hibernate.service.spi.ServiceRegistryAwareService
 import org.hibernate.service.spi.ServiceRegistryImplementor
 import org.hibernate.tool.schema.Action
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool
-import org.hibernate.tool.schema.internal.exec.GenerationTarget
 import org.hibernate.tool.schema.spi.SchemaManagementTool
 import org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator
 import org.hibernate.type.Type
 import java.io.File
-import java.io.OutputStream
+import java.lang.reflect.Proxy
 import java.net.URI
 import java.net.URL
 import java.util.*
@@ -42,29 +41,60 @@ import kotlin.system.exitProcess
 
 private const val linkToGuide = "https://atlasgo.io/guides/orms/hibernate"
 
-class ConsoleGenerationTarget(
-        private val writer: OutputStream = System.out,
-        private val enableTableGenerators: Boolean = false) : GenerationTarget {
-    override fun prepare() {}
-    override fun accept(command: String) {
-        if (!enableTableGenerators && isUnsupportedCommand(command)) {
-            throw UnsupportedGenerationType("unsupported SQL command '$command', data dependent generation is not supported. See $linkToGuide")
+// findGenerationTargetClass returns the GenerationTarget interface class, supporting both
+// Hibernate 6 (org.hibernate.tool.schema.internal.exec.GenerationTarget) and
+// Hibernate 7+ (org.hibernate.tool.schema.spi.GenerationTarget).
+private fun findGenerationTargetClass(): Class<*> {
+    return try {
+        Class.forName("org.hibernate.tool.schema.spi.GenerationTarget")
+    } catch (e: ClassNotFoundException) {
+        try {
+            Class.forName("org.hibernate.tool.schema.internal.exec.GenerationTarget")
+        } catch (e2: ClassNotFoundException) {
+            throw RuntimeException(
+                "Could not find GenerationTarget class. Ensure a compatible version of Hibernate (6 or 7) is on the classpath.",
+                e2
+            )
         }
-        writer.write("$command;\n".toByteArray())
     }
+}
 
-    override fun release() {}
-
-    private fun isUnsupportedCommand(command: String): Boolean {
-        return command.startsWith("insert into") || command.startsWith("create sequence")
-    }
+private fun isUnsupportedCommand(command: String): Boolean {
+    return command.startsWith("insert into") || command.startsWith("create sequence")
 }
 
 class ConsoleSchemaManagementTool(
         private val tool: HibernateSchemaManagementTool = HibernateSchemaManagementTool(),
         enableTableGenerators: Boolean = false): SchemaManagementTool by tool, ServiceRegistryAwareService {
     init {
-        setCustomDatabaseGenerationTarget(ConsoleGenerationTarget(enableTableGenerators = enableTableGenerators))
+        val generationTargetClass = findGenerationTargetClass()
+        val target = Proxy.newProxyInstance(
+            generationTargetClass.classLoader,
+            arrayOf(generationTargetClass)
+        ) { _, method, args ->
+            when (method.name) {
+                "prepare" -> null
+                "release" -> null
+                "accept" -> {
+                    val command = args?.get(0) as? String
+                        ?: throw IllegalArgumentException("accept() requires a non-null String argument")
+                    if (!enableTableGenerators && isUnsupportedCommand(command)) {
+                        throw UnsupportedGenerationType("unsupported SQL command '$command', data dependent generation is not supported. See $linkToGuide")
+                    }
+                    System.out.write("$command;\n".toByteArray())
+                    null
+                }
+                else -> null
+            }
+        }
+        try {
+            tool.javaClass.getMethod("setCustomDatabaseGenerationTarget", generationTargetClass).invoke(tool, target)
+        } catch (e: ReflectiveOperationException) {
+            throw RuntimeException(
+                "Failed to set custom database generation target. Ensure a compatible version of Hibernate (6 or 7) is on the classpath.",
+                e
+            )
+        }
     }
 
     override fun injectServices(serviceRegistry: ServiceRegistryImplementor) {
