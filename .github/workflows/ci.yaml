@@ -125,6 +125,19 @@ jobs:
           output=$(atlas migrate diff --env hibernate)
           [ "$output" = "The migration directory is synced with the desired state, no changes to be made" ] || (echo "diff detected? unexpected output: $output"; ls -l migrations; exit 1)
 
+      - name: Integration test with Hibernate 7
+        run: |
+          set -x
+          normalize_and_diff() {
+            local output_file="$1"
+            local expected_file="$2"
+            sed "s|$(pwd)/||g" "$output_file" > "${output_file}_normalized"
+            diff "${output_file}_normalized" "$expected_file"
+          }
+          cd examples/with_hibernate7
+          ./gradlew -q schema | tee schema_output
+          normalize_and_diff schema_output src/test/expected_default_schema
+
       - name: Release
         if: github.event_name == 'workflow_dispatch'
         run: |
