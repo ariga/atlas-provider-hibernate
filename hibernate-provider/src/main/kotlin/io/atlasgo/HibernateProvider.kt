@@ -42,7 +42,7 @@ private const val linkToGuide = "https://atlasgo.io/guides/orms/hibernate"
 // GenerationTarget moved from o.h.tool.schema.internal.exec (H6) to o.h.tool.schema.spi (H7).
 // We must not reference the H6 interface directly in bytecode, as the class would fail to load
 // on H7. Instead we create a Proxy at runtime against whichever interface is present.
-private fun buildConsoleGenerationTarget(
+internal fun buildConsoleGenerationTarget(
     writer: OutputStream = System.out,
     enableTableGenerators: Boolean = false
 ): Any {
@@ -80,6 +80,15 @@ private fun buildConsoleSchemaManagementTool(enableTableGenerators: Boolean): Hi
     // call via reflection so we are not bound to either type at compile time.
     tool.javaClass.methods.first { it.name == "setCustomDatabaseGenerationTarget" }.invoke(tool, target)
     return tool
+}
+
+class ConsoleSchemaManagementTool : HibernateSchemaManagementTool() {
+    override fun injectServices(serviceRegistry: org.hibernate.service.spi.ServiceRegistryImplementor) {
+        super.injectServices(serviceRegistry)
+        val target = buildConsoleGenerationTarget()
+        this.javaClass.methods.first { it.name == "setCustomDatabaseGenerationTarget" }
+            .invoke(this, target)
+    }
 }
 
 class ScanEnvironmentImpl(
