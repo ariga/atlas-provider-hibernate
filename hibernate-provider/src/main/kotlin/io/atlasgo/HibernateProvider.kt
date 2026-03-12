@@ -20,16 +20,13 @@ import org.hibernate.engine.jdbc.connections.internal.UserSuppliedConnectionProv
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.id.IdentifierGenerator
 import org.hibernate.service.ServiceRegistry
-import org.hibernate.service.spi.ServiceRegistryAwareService
-import org.hibernate.service.spi.ServiceRegistryImplementor
 import org.hibernate.tool.schema.Action
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool
-import org.hibernate.tool.schema.internal.exec.GenerationTarget
-import org.hibernate.tool.schema.spi.SchemaManagementTool
 import org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator
 import org.hibernate.type.Type
 import java.io.File
 import java.io.OutputStream
+import java.lang.reflect.Proxy
 import java.net.URI
 import java.net.URL
 import java.util.*
@@ -42,33 +39,55 @@ import kotlin.system.exitProcess
 
 private const val linkToGuide = "https://atlasgo.io/guides/orms/hibernate"
 
-class ConsoleGenerationTarget(
-        private val writer: OutputStream = System.out,
-        private val enableTableGenerators: Boolean = false) : GenerationTarget {
-    override fun prepare() {}
-    override fun accept(command: String) {
-        if (!enableTableGenerators && isUnsupportedCommand(command)) {
-            throw UnsupportedGenerationType("unsupported SQL command '$command', data dependent generation is not supported. See $linkToGuide")
-        }
-        writer.write("$command;\n".toByteArray())
+// GenerationTarget moved from o.h.tool.schema.internal.exec (H6) to o.h.tool.schema.spi (H7).
+// We must not reference the H6 interface directly in bytecode, as the class would fail to load
+// on H7. Instead we create a Proxy at runtime against whichever interface is present.
+internal fun buildConsoleGenerationTarget(
+    writer: OutputStream = System.out,
+    enableTableGenerators: Boolean = false
+): Any {
+    val generationTargetInterface = try {
+        Class.forName("org.hibernate.tool.schema.spi.GenerationTarget")  // H7
+    } catch (_: ClassNotFoundException) {
+        Class.forName("org.hibernate.tool.schema.internal.exec.GenerationTarget")  // H6
     }
-
-    override fun release() {}
-
-    private fun isUnsupportedCommand(command: String): Boolean {
-        return command.startsWith("insert into") || command.startsWith("create sequence")
+    return Proxy.newProxyInstance(generationTargetInterface.classLoader, arrayOf(generationTargetInterface)) { _, method, args ->
+        when (method.name) {
+            "accept" -> {
+                val command = args!![0] as String
+                if (!enableTableGenerators && (command.startsWith("insert into") || command.startsWith("create sequence"))) {
+                    throw UnsupportedGenerationType(
+                        "unsupported SQL command '$command', data dependent generation is not supported. See $linkToGuide"
+                    )
+                }
+                writer.write("$command;\n".toByteArray())
+                null
+            }
+            "prepare", "release" -> null
+            else -> null  // beforeScript is a default no-op
+        }
     }
 }
 
-class ConsoleSchemaManagementTool(
-        private val tool: HibernateSchemaManagementTool = HibernateSchemaManagementTool(),
-        enableTableGenerators: Boolean = false): SchemaManagementTool by tool, ServiceRegistryAwareService {
-    init {
-        setCustomDatabaseGenerationTarget(ConsoleGenerationTarget(enableTableGenerators = enableTableGenerators))
-    }
+// Configures a HibernateSchemaManagementTool with our console target and returns it directly.
+// We avoid wrapping it in a subclass because any class that references GenerationTarget in its
+// method signatures (e.g. via SchemaManagementTool delegation) would fail to load on H7 where
+// the H6 o.h.tool.schema.internal.exec.GenerationTarget no longer exists.
+private fun buildConsoleSchemaManagementTool(enableTableGenerators: Boolean): HibernateSchemaManagementTool {
+    val tool = HibernateSchemaManagementTool()
+    val target = buildConsoleGenerationTarget(enableTableGenerators = enableTableGenerators)
+    // setCustomDatabaseGenerationTarget parameter type changed packages between H6 and H7;
+    // call via reflection so we are not bound to either type at compile time.
+    tool.javaClass.methods.first { it.name == "setCustomDatabaseGenerationTarget" }.invoke(tool, target)
+    return tool
+}
 
-    override fun injectServices(serviceRegistry: ServiceRegistryImplementor) {
-        tool.injectServices(serviceRegistry)
+class ConsoleSchemaManagementTool : HibernateSchemaManagementTool() {
+    override fun injectServices(serviceRegistry: org.hibernate.service.spi.ServiceRegistryImplementor) {
+        super.injectServices(serviceRegistry)
+        val target = buildConsoleGenerationTarget()
+        this.javaClass.methods.first { it.name == "setCustomDatabaseGenerationTarget" }
+            .invoke(this, target)
     }
 }
 
@@ -122,7 +141,7 @@ class PrintSchemaCommand: CliktCommand() {
         mapOf(
             "hibernate.boot.allow_jdbc_metadata_access" to false,
             "hibernate.temp.use_jdbc_metadata_defaults" to false, // deprecated from hibernate 6.5
-            AvailableSettings.SCHEMA_MANAGEMENT_TOOL to ConsoleSchemaManagementTool(HibernateSchemaManagementTool(), enableTableGenerator),
+            AvailableSettings.SCHEMA_MANAGEMENT_TOOL to buildConsoleSchemaManagementTool(enableTableGenerator),
             AvailableSettings.CONNECTION_PROVIDER to UserSuppliedConnectionProviderImpl(),
         ).forEach {
             if (!settings.containsKey(it.key)) {
