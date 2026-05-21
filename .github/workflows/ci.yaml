@@ -13,14 +13,14 @@ jobs:
   gradle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-java@17f84c3641ba7b8f6deff6309fc4c864478f5d62 # v3
         with:
           distribution: temurin
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.2
+        uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629 # v2.4.2
 
       - name: Import GPG key
         run: |
@@ -36,7 +36,7 @@ jobs:
           sed "s@MAVEN_CENTRAL_PASSWORD@${{ secrets.MAVEN_CENTRAL_PORTAL_PASSWORD }}@" maven-plugin/settings.xml.tmpl | sed "s@MAVEN_CENTRAL_USERNAME@${{ secrets.MAVEN_CENTRAL_PORTAL_USER_NAME }}@" > /tmp/settings.xml
 
       - name: Setup Atlas
-        uses: ariga/setup-atlas@master
+        uses: ariga/setup-atlas@2f3c785c89a15e1c0d07bcae3900fb5feb969eea # v0.3
         with:
           cloud-token: ${{ secrets.ATLAS_TOKEN }}
 
@@ -108,7 +108,7 @@ jobs:
           fi
           set +x
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@17f84c3641ba7b8f6deff6309fc4c864478f5d62 # v3
         with:
           distribution: zulu
           java-version: 17
