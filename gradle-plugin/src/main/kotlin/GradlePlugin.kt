@@ -15,6 +15,8 @@ import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.io.File
+import java.net.URI
+import java.util.zip.ZipFile
 
 abstract class SchemaTask : JavaExec() {
     @Input
@@ -100,7 +102,10 @@ abstract class SchemaTask : JavaExec() {
         sourceListFile.parentFile.mkdirs()
         sourceListFile.writeText(allSourceFiles.joinToString(System.lineSeparator()))
         args += listOf("--sources-list-file", sourceListFile.absolutePath)
-        this.args = args
+        val argFile = project.layout.buildDirectory.file("tmp/atlas-args.txt").get().asFile
+        argFile.parentFile.mkdirs()
+        argFile.writeText(args.joinToString(System.lineSeparator()) { it.replace('\\', '/') })
+        this.args = listOf("@${argFile.absolutePath.replace('\\', '/')}")
         super.exec()
     }
 
